@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { normalizeJsonForDiff, prepareStructuredCompare } from "./structuredCompare";
+import {
+  normalizeJsonForDiff,
+  normalizeYamlForDiff,
+  prepareStructuredCompare,
+} from "./structuredCompare";
 
 describe("structured compare utilities", () => {
   it("normalizes JSON with stable key ordering", () => {
@@ -75,5 +79,56 @@ describe("structured compare utilities", () => {
       strategy: "text",
       errors: [],
     });
+  });
+
+  it("normalizes YAML with stable key ordering", () => {
+    const result = normalizeYamlForDiff("z: 1\na: 2\nnested:\n  b: 1\n  a: 2\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "a: 2\nnested:\n  a: 2\n  b: 1\nz: 1",
+    });
+  });
+
+  it("uses normalized YAML when both sides are YAML", () => {
+    const result = prepareStructuredCompare({
+      original: "b: 2\na: 1\n",
+      modified: "a: 1\nb: 2\n",
+      leftLanguage: "yaml",
+      rightLanguage: "yaml",
+    });
+
+    expect(result).toEqual({
+      original: "a: 1\nb: 2",
+      modified: "a: 1\nb: 2",
+      strategy: "yaml",
+      errors: [],
+    });
+  });
+
+  it("normalizes multi-document YAML consistently", () => {
+    const result = normalizeYamlForDiff("b: 2\na: 1\n---\nservice:\n  z: 3\n  a: 1\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "a: 1\nb: 2\n---\nservice:\n  a: 1\n  z: 3",
+    });
+  });
+
+  it("falls back to text diff and reports invalid YAML errors", () => {
+    const result = prepareStructuredCompare({
+      original: "service: [",
+      modified: "service:\n  image: app:latest\n",
+      leftLanguage: "yaml",
+      rightLanguage: "yaml",
+    });
+
+    expect(result.strategy).toBe("text");
+    expect(result.errors).toEqual([
+      {
+        side: "left",
+        message: expect.any(String),
+      },
+    ]);
   });
 });

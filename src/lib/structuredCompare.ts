@@ -1,3 +1,5 @@
+import { parseAllDocuments, stringify } from "yaml";
+
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
 
 export interface StructuredCompareError {
@@ -8,7 +10,7 @@ export interface StructuredCompareError {
 export interface StructuredCompareResult {
   original: string;
   modified: string;
-  strategy: "text" | "json";
+  strategy: "text" | "json" | "yaml";
   errors: StructuredCompareError[];
 }
 
@@ -23,6 +25,7 @@ interface NormalizeJsonFailure {
 }
 
 type NormalizeJsonResult = NormalizeJsonSuccess | NormalizeJsonFailure;
+type NormalizeYamlResult = NormalizeJsonResult;
 
 function isPlainObject(value: JsonValue): value is { [key: string]: JsonValue } {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -62,6 +65,41 @@ export function normalizeJsonForDiff(input: string): NormalizeJsonResult {
   }
 }
 
+export function normalizeYamlForDiff(input: string): NormalizeYamlResult {
+  if (input.trim().length === 0) {
+    return { ok: true, output: "" };
+  }
+
+  try {
+    const documents = parseAllDocuments(input);
+
+    for (const document of documents) {
+      if (document.errors.length > 0) {
+        throw document.errors[0];
+      }
+    }
+
+    const normalizedDocuments = documents.map((document) => {
+      const parsed = document.toJS() as JsonValue;
+      const sorted = sortJsonValue(parsed);
+      return stringify(sorted, {
+        defaultStringType: "PLAIN",
+        sortMapEntries: true,
+      }).trimEnd();
+    });
+
+    return {
+      ok: true,
+      output: normalizedDocuments.join("\n---\n"),
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      message: error instanceof Error ? error.message : "Invalid YAML input",
+    };
+  }
+}
+
 export function prepareStructuredCompare(input: {
   original: string;
   modified: string;
@@ -71,6 +109,37 @@ export function prepareStructuredCompare(input: {
   const { original, modified, leftLanguage, rightLanguage } = input;
 
   if (leftLanguage !== "json" || rightLanguage !== "json") {
+    if (leftLanguage === "yaml" && rightLanguage === "yaml") {
+      const left = normalizeYamlForDiff(original);
+      const right = normalizeYamlForDiff(modified);
+
+      if (left.ok && right.ok) {
+        return {
+          original: left.output,
+          modified: right.output,
+          strategy: "yaml",
+          errors: [],
+        };
+      }
+
+      const errors: StructuredCompareError[] = [];
+
+      if (!left.ok) {
+        errors.push({ side: "left", message: left.message });
+      }
+
+      if (!right.ok) {
+        errors.push({ side: "right", message: right.message });
+      }
+
+      return {
+        original,
+        modified,
+        strategy: "text",
+        errors,
+      };
+    }
+
     return {
       original,
       modified,
