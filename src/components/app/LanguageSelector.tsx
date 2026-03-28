@@ -1,18 +1,18 @@
 import { For } from "solid-js";
+import { type Language, SUPPORTED_LANGUAGES } from "@/lib/language";
 
 export const LANGUAGES = [
-  { value: "text", label: "Plain text" },
-  { value: "json", label: "JSON" },
-  { value: "yaml", label: "YAML" },
-  { value: "javascript", label: "JavaScript" },
-  { value: "typescript", label: "TypeScript" },
-  { value: "python", label: "Python" },
-  { value: "markdown", label: "Markdown" },
-  { value: "xml", label: "XML" },
-  { value: "html", label: "HTML" },
-] as const;
-
-export type Language = (typeof LANGUAGES)[number]["value"];
+  { value: SUPPORTED_LANGUAGES[0], label: "Plain text" },
+  { value: SUPPORTED_LANGUAGES[1], label: "JSON" },
+  { value: SUPPORTED_LANGUAGES[2], label: "YAML" },
+  { value: SUPPORTED_LANGUAGES[3], label: ".env" },
+  { value: SUPPORTED_LANGUAGES[4], label: "JavaScript" },
+  { value: SUPPORTED_LANGUAGES[5], label: "TypeScript" },
+  { value: SUPPORTED_LANGUAGES[6], label: "Python" },
+  { value: SUPPORTED_LANGUAGES[7], label: "Markdown" },
+  { value: SUPPORTED_LANGUAGES[8], label: "XML" },
+  { value: SUPPORTED_LANGUAGES[9], label: "HTML" },
+];
 
 interface Props {
   value: Language;

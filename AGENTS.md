@@ -6,9 +6,9 @@ This is the canonical instruction file for AI agents and contributors. `CLAUDE.m
 
 ## Project Overview
 
-**twish** is a fully offline, client-side PWA for comparing text files — configs, code, and plain text. No server, no uploads, no tracking.
+**twish** is a desktop-first, local-first PWA for comparing config files, code, and plain text. No server, no uploads, no tracking.
 
-Stack: Astro 5 · React · Tailwind CSS v4 · CodeMirror 6 · TypeScript strict · Bun
+Stack: Astro 5 · SolidJS · Tailwind CSS v4 · CodeMirror 6 · TypeScript strict · Bun
 
 ---
 
@@ -23,12 +23,12 @@ src/
 │   ├── landing/
 │   │   ├── Hero.astro            # Landing page hero section
 │   │   └── FeatureCard.astro     # Reusable feature highlight card
-│   └── app/                      # React components (client-side only)
+│   └── app/                      # Solid components (client-side only)
 │       ├── DiffApp.tsx           # Root state manager
 │       ├── EditorPanel.tsx       # CodeMirror editor + drag-and-drop + file open
-│       ├── DiffView.tsx          # Side-by-side diff output
 │       ├── LanguageSelector.tsx  # Language dropdown for syntax highlighting
-│       └── Toolbar.tsx           # Compare / Swap / Clear buttons
+│       ├── DiffView.tsx          # Legacy diff renderer (candidate for removal)
+│       └── Toolbar.tsx           # Legacy toolbar (candidate for removal)
 ├── layouts/
 │   ├── BaseLayout.astro          # HTML shell, meta, OG tags, PWA manifest
 │   ├── MarketingLayout.astro     # BaseLayout + Header + Footer
@@ -83,9 +83,9 @@ src/
 
 ---
 
-## React Components (in `/app`)
+## Solid Components (in `/app`)
 
-All React components live in `src/components/app/` and are loaded with `client:load` in `src/pages/app.astro`.
+All interactive app components live in `src/components/app/` and are loaded with `client:load` in `src/pages/app.astro`.
 
 - State is managed in `DiffApp.tsx` — pass props/callbacks down; don't use a state library
 - Keep components focused; avoid putting business logic in Astro files
@@ -162,11 +162,9 @@ chore/<short-description>
 
 Triggered on push to `main` and all PRs. Runs type-check, lint, format check, test, build.
 
-### `deploy.yml`
+### Production deploy
 
-Triggered on push to `main`. Deploys to GitHub Pages at `https://abijith-suresh.github.io/twish`.
-
-Requires: GitHub Pages enabled in Settings → Pages → Source: GitHub Actions.
+Production is hosted on Vercel at `https://twish.vercel.app`.
 
 ### `audit.yml`
 

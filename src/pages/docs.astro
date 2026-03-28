@@ -2,7 +2,6 @@
 import MarketingLayout from "@/layouts/MarketingLayout.astro";
 
 const shortcuts = [
-  { keys: "Ctrl + Enter", action: "Run comparison" },
   { keys: "Ctrl + O", action: "Open file (focused panel)" },
   { keys: "Ctrl + Shift + C", action: "Clear both panels" },
 ];
@@ -10,6 +9,7 @@ const shortcuts = [
 const languages = [
   "JSON",
   "YAML",
+  ".env",
   "JavaScript",
   "TypeScript",
   "Python",
@@ -22,110 +22,137 @@ const languages = [
 
 <MarketingLayout title="Docs — twish">
   <div class="max-w-2xl mx-auto px-6 py-16">
-    <p class="font-mono text-xs text-dusk-amber uppercase tracking-widest mb-4">Documentation</p>
-    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-dusk-text mb-12">
+    <p class="font-mono text-xs text-cat-blue uppercase tracking-widest mb-4">Documentation</p>
+    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-cat-text mb-12">
       Documentation
     </h1>
 
     <!-- Quick start -->
     <section class="mb-10">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text mb-4">Quick start</h2>
+      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text mb-4">Quick start</h2>
       <ol class="flex flex-col gap-3 list-none p-0">
-        {
-          [
-            <>
-              Go to{" "}
-              <a
-                href="/app"
-                class="text-dusk-amber underline underline-offset-2 hover:text-dusk-text transition-colors"
-              >
-                twish/app
-              </a>{" "}
-              to open the diff tool.
-            </>,
-            <>
-              Paste text into the <strong class="text-dusk-text">Original</strong> and{" "}
-              <strong class="text-dusk-text">Modified</strong> panels — or drag and drop files onto
-              them.
-            </>,
-            <>Select the language for syntax highlighting using the dropdown above each panel.</>,
-            <>
-              Click <strong class="text-dusk-text">Compare</strong> or press{" "}
-              <kbd class="font-mono text-xs bg-dusk-surface text-dusk-muted border border-dusk-border px-1.5 py-0.5">
-                Ctrl+Enter
-              </kbd>{" "}
-              to run the diff.
-            </>,
-          ].map((content, i) => (
-            <li class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed">
-              <span class="flex items-center justify-center w-6 h-6 flex-shrink-0 bg-dusk-surface border border-dusk-amber font-mono text-xs text-dusk-amber">
-                {i + 1}
-              </span>
-              <span>{content}</span>
-            </li>
-          ))
-        }
+        <li
+          class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
+        >
+          <span
+            class="flex items-center justify-center w-6 h-6 flex-shrink-0 bg-cat-surface0 border border-cat-blue font-mono text-xs text-cat-blue"
+          >
+            1
+          </span>
+          <span>
+            Go to{" "}
+            <a
+              href="/app"
+              class="text-cat-blue underline underline-offset-2 hover:text-cat-text transition-colors"
+            >
+              twish/app
+            </a>{" "}
+            to open the diff tool.
+          </span>
+        </li>
+        <li
+          class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
+        >
+          <span
+            class="flex items-center justify-center w-6 h-6 flex-shrink-0 bg-cat-surface0 border border-cat-blue font-mono text-xs text-cat-blue"
+          >
+            2
+          </span>
+          <span>
+            Paste text into the <strong class="text-cat-text">Original</strong> and{" "}
+            <strong class="text-cat-text">Modified</strong> panels — or drag and drop files onto them.
+          </span>
+        </li>
+        <li
+          class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
+        >
+          <span
+            class="flex items-center justify-center w-6 h-6 flex-shrink-0 bg-cat-surface0 border border-cat-blue font-mono text-xs text-cat-blue"
+          >
+            3
+          </span>
+          <span
+            >Select the language for syntax highlighting using the dropdown above each panel.</span
+          >
+        </li>
+        <li
+          class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
+        >
+          <span
+            class="flex items-center justify-center w-6 h-6 flex-shrink-0 bg-cat-surface0 border border-cat-blue font-mono text-xs text-cat-blue"
+          >
+            4
+          </span>
+          <span>
+            The diff updates automatically. Use <strong class="text-cat-text">Changes only</strong>
+            and the panel language pickers to refine what you are looking at.
+          </span>
+        </li>
       </ol>
     </section>
 
     <!-- Loading files -->
     <section class="mb-10">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text mb-4">Loading files</h2>
+      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text mb-4">Loading files</h2>
       <div
-        class="flex flex-col gap-3 font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed"
+        class="flex flex-col gap-3 font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
       >
         <p>
-          <strong class="text-dusk-text">Drag & drop</strong> — drag any text file from your file manager
+          <strong class="text-cat-text">Drag & drop</strong> — drag any text file from your file manager
           and drop it onto either editor panel. The file content will load into that panel.
         </p>
         <p>
-          <strong class="text-dusk-text">File picker</strong> — click the{" "}
-          <strong class="text-dusk-text">Open File</strong> button below each panel, or press{" "}
+          <strong class="text-cat-text">File picker</strong> — click the{" "}
+          <strong class="text-cat-text">Open File</strong> button below each panel, or press{" "}
           <kbd
-            class="font-mono text-xs bg-dusk-surface text-dusk-muted border border-dusk-border px-1.5 py-0.5"
+            class="font-mono text-xs bg-cat-surface0 text-cat-subtext0 border border-cat-surface1 px-1.5 py-0.5"
           >
             Ctrl+O
           </kbd>{" "}
           when a panel is focused.
         </p>
         <p>
-          <strong class="text-dusk-text">Paste</strong> — click into any panel and paste text directly
+          <strong class="text-cat-text">Paste</strong> — click into any panel and paste text directly
           from the clipboard.
+        </p>
+        <p>
+          <strong class="text-cat-text">Best fit</strong> — twish works especially well for JSON, YAML,
+          `.env`, and other developer-oriented config files that you want to compare locally.
         </p>
       </div>
     </section>
 
     <!-- Keyboard shortcuts -->
     <section class="mb-10">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text mb-4">
+      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text mb-4">
         Keyboard shortcuts
       </h2>
-      <div class="border border-dusk-border overflow-hidden">
+      <div class="border border-cat-surface1 overflow-hidden">
         <table class="w-full border-collapse font-[Manrope,sans-serif] text-sm">
           <thead>
-            <tr class="bg-dusk-surface border-b border-dusk-border">
+            <tr class="bg-cat-surface0 border-b border-cat-surface1">
               <th
-                class="px-4 py-2.5 text-left font-mono text-xs text-dusk-amber uppercase tracking-widest"
+                class="px-4 py-2.5 text-left font-mono text-xs text-cat-blue uppercase tracking-widest"
               >
                 Shortcut
               </th>
               <th
-                class="px-4 py-2.5 text-left font-mono text-xs text-dusk-amber uppercase tracking-widest"
+                class="px-4 py-2.5 text-left font-mono text-xs text-cat-blue uppercase tracking-widest"
               >
                 Action
               </th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-dusk-border">
+          <tbody class="divide-y divide-cat-surface1">
             {
               shortcuts.map((s) => (
                 <tr>
                   <td class="px-4 py-3">
-                    <kbd class="font-mono text-xs bg-dusk-surface text-dusk-muted border border-dusk-border px-1.5 py-0.5">
+                    <kbd class="font-mono text-xs bg-cat-surface0 text-cat-subtext0 border border-cat-surface1 px-1.5 py-0.5">
                       {s.keys}
                     </kbd>
                   </td>
-                  <td class="px-4 py-3 text-dusk-muted">{s.action}</td>
+                  <td class="px-4 py-3 text-cat-subtext0">{s.action}</td>
                 </tr>
               ))
             }
@@ -136,13 +163,13 @@ const languages = [
 
     <!-- Supported languages -->
     <section class="mb-10">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text mb-4">
+      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text mb-4">
         Supported languages
       </h2>
       <div class="flex flex-wrap gap-2">
         {
           languages.map((lang) => (
-            <span class="font-mono text-xs text-dusk-muted border border-dusk-border px-2.5 py-1 bg-dusk-surface uppercase tracking-wide">
+            <span class="font-mono text-xs text-cat-subtext0 border border-cat-surface1 px-2.5 py-1 bg-cat-surface0 tracking-wide">
               {lang}
             </span>
           ))
@@ -152,20 +179,21 @@ const languages = [
 
     <!-- Install as PWA -->
     <section class="mb-10">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text mb-4">
+      <h2 class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text mb-4">
         Install as a PWA
       </h2>
       <div
-        class="flex flex-col gap-3 font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed"
+        class="flex flex-col gap-3 font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed"
       >
         <p>
-          twish can be installed as a desktop or mobile app, and will work completely offline after
-          installation.
+          twish can be installed as a desktop app and will keep working after the first successful
+          load once the app shell is cached.
         </p>
         <p>
-          In Chrome/Edge: click the install icon in the address bar. In Safari on iOS: tap Share →
-          Add to Home Screen. Once installed, all assets are cached and the app works without an
-          internet connection.
+          In Chrome or Edge, click the install icon in the address bar. The app is desktop-first,
+          local-first, launches directly into <code class="font-mono text-xs text-cat-text"
+            >/app</code
+          >, and is designed for quick compare sessions without sending file contents to a server.
         </p>
       </div>
     </section>

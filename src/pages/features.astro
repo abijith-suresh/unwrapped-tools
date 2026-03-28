@@ -6,34 +6,34 @@ const features = [
     category: "Comparison",
     items: [
       {
-        title: "Side-by-side diff view",
+        title: "Live side-by-side diff",
         description:
-          "Two-column split layout — original on the left, modified on the right. Changed lines are highlighted with distinct colors for additions and removals.",
+          "The diff updates automatically as you type, paste, drop, or open files. Original stays on the left, modified stays on the right.",
       },
       {
-        title: "Line-level highlighting",
+        title: "Changes-only mode",
         description:
-          "Each changed line is marked clearly. Unchanged lines are shown for context. Diff summary shows total additions and removals.",
+          "Focus on changed sections while still keeping nearby context. Jump through edits without manually scanning the whole table.",
       },
     ],
   },
   {
-    category: "Editor",
+    category: "Config Workflows",
     items: [
       {
-        title: "CodeMirror 6 editor",
+        title: "Structured config compare",
         description:
-          "A full-featured code editor in each panel — line numbers, syntax highlighting, keyboard-friendly navigation.",
+          "twish is especially useful for JSON, YAML, .env files, CI workflows, and other text-based config files.",
       },
       {
-        title: "Syntax highlighting",
+        title: "Syntax-aware editing surface",
         description:
-          "Languages supported: JSON, YAML, JavaScript, TypeScript, Python, Markdown, XML, HTML, and plain text.",
+          "CodeMirror 6 provides an editor surface that feels familiar for developer-oriented file formats.",
       },
       {
-        title: "Language selector",
+        title: "Per-panel language control",
         description:
-          "Choose the language for each panel independently. The editor will highlight syntax accordingly.",
+          "Pick a language for each side independently when you want syntax highlighting to match the file you are comparing.",
       },
     ],
   },
@@ -51,7 +51,8 @@ const features = [
       },
       {
         title: "File open button",
-        description: "Click the Open File button (or press Ctrl+O) to use the native file picker.",
+        description:
+          "Click Open file or press Ctrl+O to use the native file picker for the active panel.",
       },
     ],
   },
@@ -60,7 +61,7 @@ const features = [
     items: [
       {
         title: "Installable",
-        description: "Add twish to your home screen or desktop from the browser's install prompt.",
+        description: "Install twish as a desktop app from the browser's install prompt.",
       },
       {
         title: "Fully offline",
@@ -70,16 +71,17 @@ const features = [
       {
         title: "No data sent anywhere",
         description:
-          "There is no server. No file contents, no diffs, no usage data leaves your device.",
+          "There is no server-side diffing. File contents stay on your device and the app remains usable offline after first load.",
       },
     ],
   },
   {
-    category: "Keyboard Shortcuts",
+    category: "Navigation",
     items: [
       {
-        title: "Ctrl+Enter — Compare",
-        description: "Run the comparison and render the diff view.",
+        title: "Live diff toolbar",
+        description:
+          "The toolbar keeps updating state visible and lets you swap panels, clear the workspace, and tune the diff view.",
       },
       {
         title: "Ctrl+O — Open file",
@@ -96,28 +98,28 @@ const features = [
 
 <MarketingLayout title="Features — twish">
   <div class="max-w-3xl mx-auto px-6 py-16">
-    <p class="font-mono text-xs text-dusk-amber uppercase tracking-widest mb-4">Features</p>
-    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-dusk-text mb-3">
+    <p class="font-mono text-xs text-cat-blue uppercase tracking-widest mb-4">Features</p>
+    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-cat-text mb-3">
       What twish can do
     </h1>
-    <p class="font-[Manrope,sans-serif] text-dusk-muted mb-12">
-      Everything twish can do — and what's coming next.
+    <p class="font-[Manrope,sans-serif] text-cat-subtext0 mb-12">
+      A local-first compare workflow for configs, code, and other text-based files.
     </p>
 
     <div class="flex flex-col gap-10">
       {
         features.map((section) => (
           <div>
-            <span class="inline-block font-mono text-xs text-dusk-amber uppercase tracking-widest border border-dusk-amber px-2 py-0.5 mb-4">
+            <span class="inline-block font-mono text-xs text-cat-blue uppercase tracking-widest border border-cat-blue px-2 py-0.5 mb-4">
               {section.category}
             </span>
-            <div class="border border-dusk-border divide-y divide-dusk-border">
+            <div class="border border-cat-surface1 divide-y divide-cat-surface1">
               {section.items.map((item) => (
                 <div class="px-5 py-4">
-                  <h3 class="font-[Manrope,sans-serif] font-semibold text-sm text-dusk-text uppercase tracking-wide mb-1">
+                  <h3 class="font-[Manrope,sans-serif] font-semibold text-sm text-cat-text uppercase tracking-wide mb-1">
                     {item.title}
                   </h3>
-                  <p class="font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed">
+                  <p class="font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed">
                     {item.description}
                   </p>
                 </div>

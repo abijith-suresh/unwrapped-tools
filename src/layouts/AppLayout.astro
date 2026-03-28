@@ -5,27 +5,22 @@ interface Props {
   title?: string;
 }
 
-const { title = "twish — diff tool" } = Astro.props;
+const { title = "twish — local config compare" } = Astro.props;
 ---
 
 <BaseLayout
   title={title}
-  description="Compare files side by side, offline, in your browser."
-  bodyClass="bg-dusk-bg text-dusk-text antialiased"
+  description="Compare config files, code, and text locally with a desktop-first live diff."
+  bodyClass="bg-cat-bg text-cat-text antialiased"
 >
-  <link
-    slot="head"
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-  />
   <div class="flex flex-col h-screen overflow-hidden font-[Manrope,sans-serif]">
     <!-- App header -->
     <header
-      class="flex items-center justify-between flex-shrink-0 px-5 py-2 bg-dusk-bg border-b border-dusk-border"
+      class="flex items-center justify-between flex-shrink-0 px-5 py-2 bg-cat-bg border-b border-cat-surface1"
     >
       <a
         href="/"
-        class="font-[Manrope,sans-serif] font-bold text-lg text-dusk-text tracking-tight no-underline"
+        class="font-[Manrope,sans-serif] font-bold text-lg text-cat-text tracking-tight no-underline"
         aria-label="twish home"
       >
         twish
@@ -33,22 +28,22 @@ const { title = "twish — diff tool" } = Astro.props;
       <nav class="flex items-center gap-1">
         <a
           href="/docs"
-          class="font-[Manrope,sans-serif] text-sm text-dusk-muted hover:text-dusk-text transition-colors px-3 py-1.5 no-underline"
+          class="font-[Manrope,sans-serif] text-sm text-cat-subtext0 hover:text-cat-text transition-colors px-3 py-1.5 no-underline"
         >
           Docs
         </a>
         <a
           href="/features"
-          class="font-[Manrope,sans-serif] text-sm text-dusk-muted hover:text-dusk-text transition-colors px-3 py-1.5 no-underline"
+          class="font-[Manrope,sans-serif] text-sm text-cat-subtext0 hover:text-cat-text transition-colors px-3 py-1.5 no-underline"
         >
           Features
         </a>
-        <div class="w-px h-4 bg-dusk-border mx-2" aria-hidden="true"></div>
+        <div class="w-px h-4 bg-cat-surface1 mx-2" aria-hidden="true"></div>
         <a
           href="https://github.com/abijith-suresh/twish"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-dusk-muted hover:text-dusk-text transition-colors p-1.5 flex items-center"
+          class="text-cat-subtext0 hover:text-cat-text transition-colors p-1.5 flex items-center"
           aria-label="View on GitHub"
         >
           <svg

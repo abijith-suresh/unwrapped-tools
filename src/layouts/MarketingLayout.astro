@@ -11,16 +11,7 @@ interface Props {
 const { title, description } = Astro.props;
 ---
 
-<BaseLayout
-  title={title}
-  description={description}
-  bodyClass="bg-dusk-bg text-dusk-text antialiased"
->
-  <link
-    slot="head"
-    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-    rel="stylesheet"
-  />
+<BaseLayout title={title} description={description} bodyClass="bg-cat-bg text-cat-text antialiased">
   <div class="flex min-h-screen flex-col font-[Manrope,sans-serif]">
     <Header />
     <main class="flex-1">

@@ -11,13 +11,16 @@ export default defineConfig({
     AstroPWA({
       registerType: "autoUpdate",
       manifest: {
+        id: "/app/",
         name: "Twish",
         short_name: "Twish",
         description:
-          "Offline file diff tool — compare configs and code without leaving your browser.",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
+          "Desktop-first, local-first config compare tool for JSON, YAML, env files, code, and text.",
+        theme_color: "#1e1e2e",
+        background_color: "#1e1e2e",
         display: "standalone",
+        start_url: "/app/",
+        scope: "/app/",
         icons: [
           {
             src: "/icons/icon-192.png",
@@ -33,7 +36,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        navigateFallback: "/",
+        navigateFallback: "/app/",
       },
     }),
   ],
