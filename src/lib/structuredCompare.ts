@@ -1,4 +1,3 @@
-import { parse as parseEnv } from "dotenv";
 import { parseAllDocuments, stringify } from "yaml";
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };
@@ -29,104 +28,54 @@ type NormalizeJsonResult = NormalizeJsonSuccess | NormalizeJsonFailure;
 type NormalizeYamlResult = NormalizeJsonResult;
 type NormalizeEnvResult = NormalizeJsonResult;
 
-function validateEnvInput(input: string) {
-  let activeQuote: '"' | "'" | "`" | null = null;
+const ENV_LINE =
+  /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/gm;
 
-  function updateQuoteState(
-    line: string,
-    startQuote: '"' | "'" | "`" | null
-  ): '"' | "'" | "`" | null {
-    let currentQuote = startQuote;
-    let escaped = false;
+function isIgnorableEnvGap(segment: string): boolean {
+  return /^(?:\s*(?:#.*)?\n?)*$/.test(segment);
+}
 
-    for (const character of line) {
-      if (currentQuote === '"') {
-        if (escaped) {
-          escaped = false;
-          continue;
-        }
+function parseEnvRecord(input: string): Record<string, string> {
+  const normalizedInput = input.replace(/\r\n?/g, "\n");
+  const values: Record<string, string> = {};
+  let lastMatchEnd = 0;
 
-        if (character === "\\") {
-          escaped = true;
-          continue;
-        }
+  for (const match of normalizedInput.matchAll(ENV_LINE)) {
+    const [fullMatch, key, rawValue = ""] = match;
+    const matchIndex = match.index ?? 0;
+    const gap = normalizedInput.slice(lastMatchEnd, matchIndex);
 
-        if (character === '"') {
-          currentQuote = null;
-        }
-
-        continue;
-      }
-
-      if (currentQuote === "'") {
-        if (character === "'") {
-          currentQuote = null;
-        }
-        continue;
-      }
-
-      if (currentQuote === "`") {
-        if (escaped) {
-          escaped = false;
-          continue;
-        }
-
-        if (character === "\\") {
-          escaped = true;
-          continue;
-        }
-
-        if (character === "`") {
-          currentQuote = null;
-        }
-        continue;
-      }
-
-      if (character === '"' || character === "'" || character === "`") {
-        currentQuote = character;
-      }
+    if (!isIgnorableEnvGap(gap)) {
+      throw new Error(`Invalid env entry: ${gap.trim()}`);
     }
 
-    return currentQuote;
+    let value = rawValue.trim();
+    const maybeQuote = value[0];
+
+    if (
+      (maybeQuote === '"' || maybeQuote === "'" || maybeQuote === "`") &&
+      !/^(['"`])([\s\S]*)\1$/u.test(value)
+    ) {
+      throw new Error("Unterminated quoted env value");
+    }
+
+    value = value.replace(/^(['"`])([\s\S]*)\1$/u, "$2");
+
+    if (maybeQuote === '"') {
+      value = value.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+    }
+
+    values[key] = value;
+    lastMatchEnd = matchIndex + fullMatch.length;
   }
 
-  for (const line of input.split("\n")) {
-    const trimmed = line.trim();
+  const trailingSegment = normalizedInput.slice(lastMatchEnd);
 
-    if (trimmed.length === 0 || trimmed.startsWith("#")) {
-      continue;
-    }
-
-    if (activeQuote) {
-      activeQuote = updateQuoteState(line, activeQuote);
-      continue;
-    }
-
-    const withoutExport = trimmed.startsWith("export ") ? trimmed.slice(7).trimStart() : trimmed;
-    const equalsIndex = withoutExport.indexOf("=");
-
-    if (equalsIndex === -1) {
-      throw new Error(`Invalid env entry: ${line}`);
-    }
-
-    const key = withoutExport.slice(0, equalsIndex).trim();
-    const value = withoutExport.slice(equalsIndex + 1);
-
-    if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(key)) {
-      throw new Error(`Invalid env key: ${key}`);
-    }
-
-    const trimmedValue = value.trimStart();
-    const openingQuote = trimmedValue[0];
-
-    if (openingQuote === '"' || openingQuote === "'" || openingQuote === "`") {
-      activeQuote = updateQuoteState(trimmedValue.slice(1), openingQuote);
-    }
+  if (!isIgnorableEnvGap(trailingSegment)) {
+    throw new Error(`Invalid env entry: ${trailingSegment.trim()}`);
   }
 
-  if (activeQuote) {
-    throw new Error("Unterminated quoted env value");
-  }
+  return values;
 }
 
 function isPlainObject(value: JsonValue): value is { [key: string]: JsonValue } {
@@ -208,8 +157,7 @@ export function normalizeEnvForDiff(input: string): NormalizeEnvResult {
   }
 
   try {
-    validateEnvInput(input);
-    const parsed = parseEnv(input);
+    const parsed = parseEnvRecord(input);
 
     const output = Object.entries(parsed)
       .sort(([leftKey], [rightKey]) => leftKey.localeCompare(rightKey))

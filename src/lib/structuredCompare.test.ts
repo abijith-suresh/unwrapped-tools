@@ -136,6 +136,15 @@ describe("structured compare utilities", () => {
     });
   });
 
+  it("preserves literal backslashes in double-quoted env values", () => {
+    const result = normalizeEnvForDiff('PATH="C:\\Program Files\\App"\nTAB="\\t"\n');
+
+    expect(result).toEqual({
+      ok: true,
+      output: "PATH=C:\\Program Files\\App\nTAB=\\t",
+    });
+  });
+
   it("accepts multiline single-quoted env values", () => {
     const result = normalizeEnvForDiff("PRIVATE_KEY='line1\nline2'\nTOKEN=abc\n");
 
@@ -169,6 +178,32 @@ describe("structured compare utilities", () => {
     expect(result).toEqual({
       ok: true,
       output: 'A=foo"bar\nTOKEN=abc',
+    });
+  });
+
+  it("ignores trailing comments after quoted env values", () => {
+    const result = normalizeEnvForDiff('A="x" # comment "quoted"\nTOKEN=abc\n');
+
+    expect(result).toEqual({
+      ok: true,
+      output: "A=x\nTOKEN=abc",
+    });
+  });
+
+  it("rejects unterminated quoted env values", () => {
+    expect(normalizeEnvForDiff('A="foo\nTOKEN=abc\n')).toEqual({
+      ok: false,
+      message: "Unterminated quoted env value",
+    });
+
+    expect(normalizeEnvForDiff("A='foo\nTOKEN=abc\n")).toEqual({
+      ok: false,
+      message: "Unterminated quoted env value",
+    });
+
+    expect(normalizeEnvForDiff("A=`foo\nTOKEN=abc\n")).toEqual({
+      ok: false,
+      message: "Unterminated quoted env value",
     });
   });
 
