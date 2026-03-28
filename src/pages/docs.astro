@@ -9,6 +9,7 @@ const shortcuts = [
 const languages = [
   "JSON",
   "YAML",
+  ".env",
   "JavaScript",
   "TypeScript",
   "Python",
@@ -168,7 +169,7 @@ const languages = [
       <div class="flex flex-wrap gap-2">
         {
           languages.map((lang) => (
-            <span class="font-mono text-xs text-cat-subtext0 border border-cat-surface1 px-2.5 py-1 bg-cat-surface0 uppercase tracking-wide">
+            <span class="font-mono text-xs text-cat-subtext0 border border-cat-surface1 px-2.5 py-1 bg-cat-surface0 tracking-wide">
               {lang}
             </span>
           ))
@@ -190,8 +191,9 @@ const languages = [
         </p>
         <p>
           In Chrome or Edge, click the install icon in the address bar. The app is desktop-first,
-          local-first, and designed for quick compare sessions without sending file contents to a
-          server.
+          local-first, launches directly into <code class="font-mono text-xs text-cat-text"
+            >/app</code
+          >, and is designed for quick compare sessions without sending file contents to a server.
         </p>
       </div>
     </section>
