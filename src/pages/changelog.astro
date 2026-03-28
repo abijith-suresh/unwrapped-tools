@@ -3,18 +3,14 @@ import MarketingLayout from "@/layouts/MarketingLayout.astro";
 
 const releases = [
   {
-    version: "0.1.0",
-    date: "2026-02-22",
-    tag: "Initial release",
+    version: "1.0.0",
+    date: null,
+    tag: "In progress",
     changes: [
-      "Side-by-side diff view with line-level highlighting",
-      "CodeMirror 6 editors with syntax highlighting (JSON, YAML, JS/TS, Python, Markdown, XML)",
-      "Drag & drop file loading",
-      "Language selector per panel",
-      "Compare, Swap, and Clear toolbar",
-      "Keyboard shortcuts: Ctrl+Enter, Ctrl+O, Ctrl+Shift+C",
-      "PWA: installable + fully offline via service worker",
-      "Pages: landing, features, about, docs, changelog",
+      "Refined product positioning around local-first config comparison",
+      "Live side-by-side diff for code, text, and structured config files",
+      "Desktop-first PWA workflow with local file input and offline support",
+      "Updated docs, marketing pages, and app copy to match the live diff interaction model",
     ],
   },
 ];
@@ -22,37 +18,37 @@ const releases = [
 
 <MarketingLayout title="Changelog — twish">
   <div class="max-w-2xl mx-auto px-6 py-16">
-    <p class="font-mono text-xs text-dusk-amber uppercase tracking-widest mb-4">Changelog</p>
-    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-dusk-text mb-12">
-      Changelog
-    </h1>
+    <p class="font-mono text-xs text-cat-blue uppercase tracking-widest mb-4">Changelog</p>
+    <h1 class="font-[Manrope,sans-serif] font-extrabold text-4xl text-cat-text mb-12">Changelog</h1>
 
     <div class="flex flex-col gap-10">
       {
         releases.map((release) => (
           <div>
             <div class="flex flex-wrap items-baseline gap-3 mb-5">
-              <h2 class="font-[Manrope,sans-serif] font-extrabold text-3xl text-dusk-text">
+              <h2 class="font-[Manrope,sans-serif] font-extrabold text-3xl text-cat-text">
                 v{release.version}
               </h2>
               {release.tag && (
-                <span class="font-mono text-xs text-dusk-amber border border-dusk-amber px-2 py-0.5 uppercase tracking-widest">
+                <span class="font-mono text-xs text-cat-blue border border-cat-blue px-2 py-0.5 uppercase tracking-widest">
                   {release.tag}
                 </span>
               )}
-              <time class="font-mono text-xs text-dusk-subtle" datetime={release.date}>
-                {new Date(release.date).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}
-              </time>
+              {release.date && (
+                <time class="font-mono text-xs text-cat-overlay0" datetime={release.date}>
+                  {new Date(release.date).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  })}
+                </time>
+              )}
             </div>
             <ul class="flex flex-col gap-2 list-none p-0">
               {release.changes.map((change) => (
-                <li class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed">
+                <li class="flex gap-3 items-start font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed">
                   <span
-                    class="inline-block w-1.5 h-1.5 rounded-full bg-dusk-amber flex-shrink-0 mt-1.5"
+                    class="inline-block w-1.5 h-1.5 rounded-full bg-cat-blue flex-shrink-0 mt-1.5"
                     aria-hidden="true"
                   />
                   {change}

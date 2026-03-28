@@ -13,10 +13,9 @@ export default defineConfig({
       manifest: {
         name: "Twish",
         short_name: "Twish",
-        description:
-          "Offline file diff tool — compare configs and code without leaving your browser.",
-        theme_color: "#ffffff",
-        background_color: "#ffffff",
+        description: "Desktop-first config compare tool for JSON, YAML, env files, code, and text.",
+        theme_color: "#1e1e2e",
+        background_color: "#1e1e2e",
         display: "standalone",
         icons: [
           {

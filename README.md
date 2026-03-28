@@ -1,29 +1,29 @@
 # twish
 
-A fully offline, installable PWA for comparing files — configs, code, or plain text — without any data leaving your browser.
+A desktop-first, local-first PWA for comparing configs, code, and plain text without uploading anything.
 
-Built because managing multiple configs across environments gets cumbersome. No server, no uploads, no tracking.
+Built because comparing environment-specific config files at work kept turning into a noisy, awkward workflow. `twish` keeps the diff local, fast, and installable.
 
-Live at: **[abijith-suresh.github.io/twish](https://abijith-suresh.github.io/twish)**
+Live at: **[twish.vercel.app](https://twish.vercel.app)**
 
-## Features
+## What it does
 
-- **Side-by-side diff** — clean split view with line-level highlighting
-- **Rich code editor** — CodeMirror 6 with syntax highlighting for JSON, YAML, JS/TS, Python, Markdown, XML, and more
-- **Drag & drop** — drop any text file onto either panel to load it
-- **Offline-first PWA** — works with no internet after the first visit; installable as a desktop/mobile app
-- **Keyboard shortcuts** — `Ctrl+Enter` to diff, `Ctrl+O` to open a file, `Ctrl+Shift+C` to clear
-- **No data sent anywhere** — purely client-side, all processing in your browser
+- **Live side-by-side diff** — compare two inputs instantly as you type, paste, drop, or open files
+- **Config-friendly workflow** — works especially well for JSON, YAML, `.env`, and other text-based config files
+- **Changes-only view** — focus on meaningful lines without losing nearby context
+- **Rich editor surface** — CodeMirror 6 with syntax highlighting for common developer file types
+- **Offline-first PWA** — install it and keep using `/app` after the first successful load
+- **Private by design** — no file uploads, no server-side diffing, no analytics; processing stays in your browser
 
 ## Stack
 
 - [Astro 5](https://astro.build) — static site framework
-- [React](https://react.dev) — interactive diff tool
-- [Tailwind CSS v4](https://tailwindcss.com) — utility-first CSS
-- [CodeMirror 6](https://codemirror.net) — code editor
-- [diff](https://github.com/kpdecker/jsdiff) — diffing engine
+- [SolidJS](https://www.solidjs.com) — interactive diff interface
+- [Tailwind CSS v4](https://tailwindcss.com) — styling and design system primitives
+- [CodeMirror 6](https://codemirror.net) — editor surface
+- [diff](https://github.com/kpdecker/jsdiff) — line diff engine
 - [Bun](https://bun.sh) — package manager and runtime
-- [GitHub Actions](https://github.com/features/actions) — CI + deploy to GitHub Pages
+- [Vercel](https://vercel.com) — production hosting
 
 ## Development
 
@@ -47,7 +47,7 @@ src/
 ├── components/
 │   ├── layout/        # Header, Footer
 │   ├── landing/       # Hero, FeatureCard
-│   └── app/           # React diff tool components
+│   └── app/           # Solid app components
 ├── layouts/
 │   ├── BaseLayout.astro
 │   ├── MarketingLayout.astro

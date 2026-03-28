@@ -7,23 +7,23 @@ const features = [
   {
     num: "01",
     icon: "⇄",
-    title: "Side-by-side diff",
+    title: "Live config diff",
     description:
-      "Clean split view with line-level highlighting. See exactly what changed at a glance.",
+      "Compare config files, code, and text instantly as you type, paste, or load local files.",
   },
   {
     num: "02",
-    icon: "✦",
-    title: "Rich code editor",
+    icon: "{}",
+    title: "Structured-file friendly",
     description:
-      "CodeMirror 6 with syntax highlighting for JSON, YAML, JavaScript, TypeScript, Python, Markdown, XML, and more.",
+      "Built for JSON, YAML, .env files, and other text-based config workflows where ordering and context matter.",
   },
   {
     num: "03",
     icon: "↓",
-    title: "Drag & drop",
+    title: "Local file input",
     description:
-      "Drop any text file onto either panel to load it instantly — no file picker dialogs needed.",
+      "Paste, drag and drop, or use the native file picker without sending file contents anywhere.",
   },
   {
     num: "04",
@@ -34,9 +34,9 @@ const features = [
   {
     num: "05",
     icon: "⌨",
-    title: "Keyboard shortcuts",
+    title: "Desktop-first workflow",
     description:
-      "Ctrl+Enter to compare, Ctrl+O to open a file, Ctrl+Shift+C to clear — stay in the flow.",
+      "Live diff keeps the compare loop fast while keyboard shortcuts keep file loading and reset actions in reach.",
   },
   {
     num: "06",
@@ -48,15 +48,15 @@ const features = [
 ];
 ---
 
-<MarketingLayout title="twish — offline file diff tool">
+<MarketingLayout title="twish — local config compare tool">
   <Hero />
 
   <section class="px-6 pb-24">
     <div class="max-w-5xl mx-auto">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-2xl text-dusk-text mb-8">
-        Everything you need to diff
+      <h2 class="font-[Manrope,sans-serif] font-bold text-2xl text-cat-text mb-8">
+        Built for everyday config compare work
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-dusk-border">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-cat-surface1">
         {
           features.map((f) => (
             <FeatureCard title={f.title} description={f.description} icon={f.icon} num={f.num} />
@@ -66,17 +66,17 @@ const features = [
     </div>
   </section>
 
-  <section class="border-t border-dusk-border px-6 py-20">
+  <section class="border-t border-cat-surface1 px-6 py-20">
     <div class="max-w-lg mx-auto">
-      <h2 class="font-[Manrope,sans-serif] font-bold text-3xl text-dusk-text mb-3">
-        Ready to compare?
+      <h2 class="font-[Manrope,sans-serif] font-bold text-3xl text-cat-text mb-3">
+        Ready to compare locally?
       </h2>
-      <p class="font-[Manrope,sans-serif] text-dusk-muted mb-8">
-        No sign-up. No server. Just paste, drop, and diff.
+      <p class="font-[Manrope,sans-serif] text-cat-subtext0 mb-8">
+        No sign-up. No file uploads. Just load two files and inspect the diff.
       </p>
       <a
         href="/app"
-        class="inline-block font-[Manrope,sans-serif] text-sm font-semibold text-dusk-amber border border-dusk-amber hover:bg-dusk-amber hover:text-dusk-bg transition-colors px-6 py-3 no-underline"
+        class="inline-block font-[Manrope,sans-serif] text-sm font-semibold text-cat-blue border border-cat-blue hover:bg-cat-blue hover:text-cat-bg transition-colors px-6 py-3 no-underline"
       >
         Open the diff tool
       </a>

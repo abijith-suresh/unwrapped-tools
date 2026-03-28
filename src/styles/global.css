@@ -1,13 +1,22 @@
+@import "@fontsource-variable/manrope";
+@import "@fontsource/jetbrains-mono";
 @import "tailwindcss";
 
 @theme {
-  --color-dusk-bg: #16120e;
-  --color-dusk-surface: #1f1a14;
-  --color-dusk-border: #3a3025;
-  --color-dusk-text: #f5ede0;
-  --color-dusk-muted: #9c8b78;
-  --color-dusk-subtle: #5c5048;
-  --color-dusk-amber: #e8963d;
+  /* Catppuccin Mocha Theme - https://catppuccin.com/palette */
+  --color-cat-bg: #1e1e2e;
+  --color-cat-surface0: #313244;
+  --color-cat-surface1: #45475a;
+  --color-cat-surface2: #585b70;
+  --color-cat-text: #cdd6f4;
+  --color-cat-subtext0: #a6adc8;
+  --color-cat-overlay0: #6c7086;
+  --color-cat-blue: #89b4fa;
+  --color-cat-lavender: #b4befe;
+  --color-cat-mauve: #cba6f7;
+  --color-cat-pink: #f5c2e7;
+  --color-cat-green: #a6e3a1;
+  --color-cat-red: #f38ba8;
   --font-manrope: "Manrope", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
 }
@@ -24,85 +33,85 @@
     @apply flex-1 min-h-0 flex flex-col;
   }
   .diff-panel--right {
-    @apply border-l border-dusk-border;
+    @apply border-l border-cat-surface1;
   }
   .diff-output {
-    @apply flex-1 min-h-0 overflow-auto border-t border-dusk-border;
+    @apply flex-1 min-h-0 overflow-auto border-t border-cat-surface1;
   }
   .diff-hint {
-    @apply flex-shrink-0 flex items-center justify-center p-5 font-mono text-xs text-dusk-subtle;
+    @apply flex-shrink-0 flex items-center justify-center p-5 font-mono text-xs text-cat-overlay0;
   }
 
   /* ── Toolbar ─────────────────────────────────────────── */
   .toolbar {
-    @apply flex items-center gap-2 flex-shrink-0 px-4 py-2 bg-dusk-surface border-b border-dusk-border;
+    @apply flex items-center gap-2 flex-shrink-0 px-4 py-2 bg-cat-surface0 border-b border-cat-surface1;
   }
   .btn-compare {
-    @apply flex items-center gap-2 bg-transparent text-dusk-amber border border-dusk-amber hover:bg-dusk-amber hover:text-dusk-bg transition-colors px-3 py-1.5 font-sans text-sm font-semibold cursor-pointer;
+    @apply flex items-center gap-2 bg-transparent text-cat-blue border border-cat-blue hover:bg-cat-blue hover:text-cat-bg transition-colors px-3 py-1.5 font-sans text-sm font-semibold cursor-pointer;
   }
   .btn-secondary {
-    @apply bg-transparent text-dusk-muted border border-dusk-border hover:text-dusk-text hover:border-dusk-muted transition-colors px-3 py-1.5 font-sans text-sm font-medium cursor-pointer;
+    @apply bg-transparent text-cat-subtext0 border border-cat-surface1 hover:text-cat-text hover:border-cat-subtext0 transition-colors px-3 py-1.5 font-sans text-sm font-medium cursor-pointer;
   }
   .kbd {
-    @apply font-mono text-[0.6rem] bg-dusk-bg text-dusk-subtle border border-dusk-border px-1.5 py-0.5;
+    @apply font-mono text-[0.6rem] bg-cat-bg text-cat-overlay0 border border-cat-surface1 px-1.5 py-0.5;
   }
 
   /* ── Editor panel ────────────────────────────────────── */
   .editor-panel {
-    @apply flex flex-col flex-1 min-h-0 border border-dusk-border overflow-hidden;
+    @apply flex flex-col flex-1 min-h-0 border border-cat-surface1 overflow-hidden;
   }
   .editor-header {
-    @apply flex items-center justify-between flex-shrink-0 px-3 py-2 bg-dusk-surface border-b border-dusk-border;
+    @apply flex items-center justify-between flex-shrink-0 px-3 py-2 bg-cat-surface0 border-b border-cat-surface1;
   }
   .editor-label {
-    @apply font-mono text-xs uppercase tracking-widest text-dusk-muted;
+    @apply font-mono text-xs uppercase tracking-widest text-cat-subtext0;
   }
   .editor-drop-zone {
     @apply relative flex-1 min-h-0;
   }
   .editor-drop-overlay {
-    @apply absolute inset-0 z-10 flex items-center justify-center bg-amber-500/20 border-2 border-dashed border-dusk-amber pointer-events-none;
+    @apply absolute inset-0 z-10 flex items-center justify-center bg-cat-blue/20 border-2 border-dashed border-cat-blue pointer-events-none;
   }
   .editor-drop-label {
-    @apply font-mono text-sm uppercase tracking-widest text-dusk-amber;
+    @apply font-mono text-sm uppercase tracking-widest text-cat-blue;
   }
   .editor-lang-loading {
-    @apply absolute top-2 right-2 z-10 font-mono text-xs text-dusk-muted pointer-events-none;
+    @apply absolute top-2 right-2 z-10 font-mono text-xs text-cat-subtext0 pointer-events-none;
   }
   .editor-cm-host {
     @apply h-full;
   }
   .editor-footer {
-    @apply flex-shrink-0 px-3 py-2 bg-dusk-surface border-t border-dusk-border;
+    @apply flex-shrink-0 px-3 py-2 bg-cat-surface0 border-t border-cat-surface1;
   }
   .editor-open-btn {
-    @apply font-mono text-xs text-dusk-subtle hover:text-dusk-muted underline underline-offset-2 bg-transparent border-none cursor-pointer;
+    @apply font-mono text-xs text-cat-overlay0 hover:text-cat-subtext0 underline underline-offset-2 bg-transparent border-none cursor-pointer;
   }
   .lang-select {
-    @apply font-mono text-xs bg-dusk-bg text-dusk-muted border border-dusk-border px-2 py-1 cursor-pointer outline-none focus:border-dusk-amber;
+    @apply font-mono text-xs bg-cat-bg text-cat-subtext0 border border-cat-surface1 px-2 py-1 cursor-pointer outline-none focus:border-cat-blue;
   }
 
   /* ── Diff output ─────────────────────────────────────── */
   .diff-empty {
-    @apply flex items-center justify-center p-12 font-mono text-sm text-dusk-muted;
+    @apply flex items-center justify-center p-12 font-mono text-sm text-cat-subtext0;
   }
   .diff-wrap {
     @apply flex flex-col min-h-0;
   }
   .diff-stats {
-    @apply flex items-center gap-4 flex-shrink-0 px-4 py-1.5 bg-dusk-surface border-b border-dusk-border font-mono text-xs;
+    @apply flex items-center gap-4 flex-shrink-0 px-4 py-1.5 bg-cat-surface0 border-b border-cat-surface1 font-mono text-xs;
   }
   .diff-stats-label {
-    @apply font-bold tracking-widest text-dusk-muted uppercase;
+    @apply font-bold tracking-widest text-cat-subtext0 uppercase;
   }
   .diff-added {
-    @apply text-green-400 font-bold;
+    @apply text-cat-green font-bold;
   }
   .diff-removed {
-    @apply text-red-400 font-bold;
+    @apply text-cat-red font-bold;
   }
   .diff-identical {
-    @apply text-dusk-subtle;
+    @apply text-cat-overlay0;
   }
   .diff-table-wrap {
     @apply flex-1 overflow-auto font-mono text-xs;
@@ -118,19 +127,19 @@
     width: calc(50% - 2.5rem);
   }
   .diff-row {
-    @apply border-b border-dusk-border/30;
+    @apply border-b border-cat-surface1/30;
   }
   .diff-linenum {
-    @apply select-none px-2 py-0.5 text-right text-dusk-subtle bg-dusk-surface whitespace-nowrap;
+    @apply select-none px-2 py-0.5 text-right text-cat-overlay0 bg-cat-surface0 whitespace-nowrap;
   }
   .diff-linenum--removed {
-    @apply bg-red-950/50 text-red-400;
+    @apply bg-red-950/50 text-cat-red;
   }
   .diff-linenum--added {
-    @apply bg-green-950/40 text-green-400;
+    @apply bg-green-950/40 text-cat-green;
   }
   .diff-content {
-    @apply px-3 py-0.5 whitespace-pre text-dusk-text;
+    @apply px-3 py-0.5 whitespace-pre text-cat-text;
   }
   .diff-content--removed {
     @apply bg-red-950/40 text-red-300;
@@ -139,15 +148,15 @@
     @apply bg-green-950/30 text-green-300;
   }
   .diff-cell--empty {
-    @apply bg-dusk-bg;
+    @apply bg-cat-bg;
   }
   .diff-marker {
     @apply mr-1.5 font-bold;
   }
   .diff-marker--removed {
-    @apply text-red-400;
+    @apply text-cat-red;
   }
   .diff-marker--added {
-    @apply text-green-400;
+    @apply text-cat-green;
   }
 }
