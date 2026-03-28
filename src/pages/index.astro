@@ -3,44 +3,57 @@ import FeatureCard from "@/components/landing/FeatureCard.astro";
 import Hero from "@/components/landing/Hero.astro";
 import MarketingLayout from "@/layouts/MarketingLayout.astro";
 
+// Lucide SVG icons (inline, MIT licensed — https://lucide.dev)
+const iconGitCompare = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M11 18H8a2 2 0 0 1-2-2V9"/></svg>`;
+
+const iconFileCode = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="m10 13-2 2 2 2"/><path d="m14 17 2-2-2-2"/></svg>`;
+
+const iconUpload = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg>`;
+
+const iconShieldOff = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+
+const iconKeyboard = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="20" height="16" x="2" y="4" rx="2" ry="2"/><path d="M6 8h.001"/><path d="M10 8h.001"/><path d="M14 8h.001"/><path d="M18 8h.001"/><path d="M8 12h.001"/><path d="M12 12h.001"/><path d="M16 12h.001"/><path d="M7 16h10"/></svg>`;
+
+const iconWifiOff = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h.01"/><path d="M8.5 16.429a5 5 0 0 1 7 0"/><path d="M5 12.859a10 10 0 0 1 5.17-2.69"/><path d="M19 12.859a10 10 0 0 0-2.007-1.523"/><path d="M2 8.82a15 15 0 0 1 4.177-2.643"/><path d="M22 8.82a15 15 0 0 0-11.288-3.764"/><line x1="2" x2="22" y1="2" y2="22"/></svg>`;
+
 const features = [
   {
     num: "01",
-    icon: "⇄",
+    icon: iconGitCompare,
     title: "Live config diff",
     description:
       "Compare config files, code, and text instantly as you type, paste, or load local files.",
   },
   {
     num: "02",
-    icon: "{}",
+    icon: iconFileCode,
     title: "Structured-file friendly",
     description:
       "Built for JSON, YAML, .env files, and other text-based config workflows where ordering and context matter.",
   },
   {
     num: "03",
-    icon: "↓",
+    icon: iconUpload,
     title: "Local file input",
     description:
       "Paste, drag and drop, or use the native file picker without sending file contents anywhere.",
   },
   {
     num: "04",
-    icon: "⊘",
+    icon: iconShieldOff,
     title: "Fully offline",
     description: "Works with zero internet after the first visit. Install it as a desktop app.",
   },
   {
     num: "05",
-    icon: "⌨",
+    icon: iconKeyboard,
     title: "Desktop-first workflow",
     description:
       "Live diff keeps the compare loop fast while keyboard shortcuts keep file loading and reset actions in reach.",
   },
   {
     num: "06",
-    icon: "⚿",
+    icon: iconWifiOff,
     title: "Private by design",
     description:
       "No server, no uploads, no analytics. Everything runs in your browser and stays there.",
@@ -48,7 +61,10 @@ const features = [
 ];
 ---
 
-<MarketingLayout title="twish — local config compare tool">
+<MarketingLayout
+  title="twish — local config compare tool"
+  description="Compare JSON, YAML, env files, and code locally with live diffing. No uploads, no accounts, no tracking — runs entirely in your browser."
+>
   <Hero />
 
   <section class="px-6 pb-24">
@@ -56,7 +72,7 @@ const features = [
       <h2 class="font-[Manrope,sans-serif] font-bold text-2xl text-cat-text mb-8">
         Built for everyday config compare work
       </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-cat-surface1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {
           features.map((f) => (
             <FeatureCard title={f.title} description={f.description} icon={f.icon} num={f.num} />
@@ -67,7 +83,7 @@ const features = [
   </section>
 
   <section class="border-t border-cat-surface1 px-6 py-20">
-    <div class="max-w-lg mx-auto">
+    <div class="max-w-lg mx-auto text-center bg-cat-surface0/30 rounded-xl px-8 py-12">
       <h2 class="font-[Manrope,sans-serif] font-bold text-3xl text-cat-text mb-3">
         Ready to compare locally?
       </h2>
@@ -76,9 +92,9 @@ const features = [
       </p>
       <a
         href="/app"
-        class="inline-block font-[Manrope,sans-serif] text-sm font-semibold text-cat-blue border border-cat-blue hover:bg-cat-blue hover:text-cat-bg transition-colors px-6 py-3 no-underline"
+        class="inline-flex items-center gap-2 bg-cat-blue text-cat-bg font-semibold font-[Manrope,sans-serif] text-sm px-6 py-3 rounded-sm hover:opacity-90 transition-opacity no-underline"
       >
-        Open the diff tool
+        Open the diff tool →
       </a>
     </div>
   </section>

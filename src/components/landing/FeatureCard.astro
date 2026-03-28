@@ -10,25 +10,27 @@ const { title, description, icon, num } = Astro.props;
 ---
 
 <div
-  class="relative bg-dusk-surface border border-dusk-border hover:border-dusk-amber transition-colors p-6 overflow-hidden"
+  class="group relative bg-cat-surface0 border border-cat-surface1 hover:border-cat-blue hover:bg-cat-surface0/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 p-6 overflow-hidden"
 >
   {
     num && (
       <span
-        class="absolute top-0 right-3 font-mono text-[5rem] text-dusk-text/5 leading-none pointer-events-none select-none"
+        class="absolute top-0 right-3 font-mono text-[5rem] text-cat-text/5 leading-none pointer-events-none select-none"
         aria-hidden="true"
       >
         {num}
       </span>
     )
   }
-  <div class="text-2xl mb-3" aria-hidden="true">{icon}</div>
-  <h3
-    class="font-[Manrope,sans-serif] font-bold text-sm text-dusk-text uppercase tracking-wide mb-2"
-  >
+  <div
+    class="text-cat-blue mb-3 group-hover:scale-110 transition-transform duration-200 inline-block"
+    aria-hidden="true"
+    set:html={icon}
+  />
+  <h3 class="font-[Manrope,sans-serif] font-bold text-sm text-cat-text tracking-wide mb-2">
     {title}
   </h3>
-  <p class="font-[Manrope,sans-serif] text-sm text-dusk-muted leading-relaxed">
+  <p class="font-[Manrope,sans-serif] text-sm text-cat-subtext0 leading-relaxed">
     {description}
   </p>
 </div>
