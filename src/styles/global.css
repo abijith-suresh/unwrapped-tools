@@ -19,6 +19,30 @@
   --color-cat-red: #f38ba8;
   --font-manrope: "Manrope", sans-serif;
   --font-mono: "JetBrains Mono", monospace;
+
+  /* Animation duration tokens */
+  --duration-fast: 100ms;
+  --duration-base: 200ms;
+  --duration-slow: 350ms;
+  --ease-default: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Semantic z-index tokens */
+  --z-sticky: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-manrope);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-cat-blue);
+  outline-offset: 2px;
 }
 
 @layer components {
@@ -47,10 +71,10 @@
     @apply flex items-center gap-2 flex-shrink-0 px-4 py-2 bg-cat-surface0 border-b border-cat-surface1;
   }
   .btn-compare {
-    @apply flex items-center gap-2 bg-transparent text-cat-blue border border-cat-blue hover:bg-cat-blue hover:text-cat-bg transition-colors px-3 py-1.5 font-sans text-sm font-semibold cursor-pointer;
+    @apply flex items-center gap-2 bg-transparent text-cat-blue border border-cat-blue hover:bg-cat-blue hover:text-cat-bg transition-colors duration-[var(--duration-base)] px-3 py-1.5 font-sans text-sm font-semibold cursor-pointer;
   }
   .btn-secondary {
-    @apply bg-transparent text-cat-subtext0 border border-cat-surface1 hover:text-cat-text hover:border-cat-subtext0 transition-colors px-3 py-1.5 font-sans text-sm font-medium cursor-pointer;
+    @apply bg-transparent text-cat-subtext0 border border-cat-surface1 hover:text-cat-text hover:border-cat-subtext0 transition-colors duration-[var(--duration-base)] px-3 py-1.5 font-sans text-sm font-medium cursor-pointer;
   }
   .kbd {
     @apply font-mono text-[0.6rem] bg-cat-bg text-cat-overlay0 border border-cat-surface1 px-1.5 py-0.5;
@@ -88,7 +112,7 @@
     @apply font-mono text-xs text-cat-overlay0 hover:text-cat-subtext0 underline underline-offset-2 bg-transparent border-none cursor-pointer;
   }
   .lang-select {
-    @apply font-mono text-xs bg-cat-bg text-cat-subtext0 border border-cat-surface1 px-2 py-1 cursor-pointer outline-none focus:border-cat-blue;
+    @apply font-mono text-xs bg-cat-bg text-cat-subtext0 border border-cat-surface1 px-2 py-1 cursor-pointer focus:border-cat-blue;
   }
 
   /* ── Diff output ─────────────────────────────────────── */
@@ -159,4 +183,9 @@
   .diff-marker--added {
     @apply text-cat-green;
   }
+}
+
+.lang-select:focus-visible {
+  outline: 2px solid var(--color-cat-blue);
+  outline-offset: 1px;
 }

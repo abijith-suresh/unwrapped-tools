@@ -16,21 +16,23 @@ export default defineConfig({
         short_name: "Twish",
         description:
           "Desktop-first, local-first config compare tool for JSON, YAML, env files, code, and text.",
-        theme_color: "#1e1e2e",
+        theme_color: "#89b4fa",
         background_color: "#1e1e2e",
         display: "standalone",
         start_url: "/app/",
         scope: "/app/",
         icons: [
           {
-            src: "/icons/icon-192.png",
+            src: "icons/icon-192.png",
             sizes: "192x192",
             type: "image/png",
+            purpose: "any",
           },
           {
-            src: "/icons/icon-512.png",
+            src: "icons/icon-512.png",
             sizes: "512x512",
             type: "image/png",
+            purpose: "any maskable",
           },
         ],
       },

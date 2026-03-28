@@ -20,12 +20,16 @@ const ogImageUrl = new URL(ogImage, Astro.site);
 ---
 
 <!doctype html>
-<html lang="en">
+<html lang="en" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#1e1e2e" />
     <meta name="description" content={description} />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- TODO: add font preload once font is in public/fonts/ (currently served from node_modules via fontsource) -->
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
@@ -46,6 +50,14 @@ const ogImageUrl = new URL(ogImage, Astro.site);
     <slot name="head" />
   </head>
   <body class:list={bodyClass}>
+    <!-- Skip to main content for keyboard/screen reader users -->
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[300] focus:bg-cat-base focus:text-cat-text focus:px-4 focus:py-2 focus:rounded focus:outline-none focus:ring-2 focus:ring-cat-blue"
+    >
+      Skip to content
+    </a>
+    <!-- Note: layouts wrapping this slot should add id="main-content" to their <main> element -->
     <slot />
   </body>
 </html>
