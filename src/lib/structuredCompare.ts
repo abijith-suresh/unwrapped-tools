@@ -28,51 +28,117 @@ type NormalizeJsonResult = NormalizeJsonSuccess | NormalizeJsonFailure;
 type NormalizeYamlResult = NormalizeJsonResult;
 type NormalizeEnvResult = NormalizeJsonResult;
 
-const ENV_LINE =
-  /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/gm;
+function parseEnvKeyAndValue(line: string): { key: string; value: string } {
+  const trimmedLine = line.trim();
 
-function isIgnorableEnvGap(segment: string): boolean {
-  return /^(?:\s*(?:#.*)?\n?)*$/.test(segment);
+  if (trimmedLine.length === 0 || trimmedLine.startsWith("#")) {
+    throw new Error(`Invalid env entry: ${line}`);
+  }
+
+  const withoutExport = trimmedLine.startsWith("export ")
+    ? trimmedLine.slice(7).trimStart()
+    : trimmedLine;
+  const equalsIndex = withoutExport.indexOf("=");
+
+  if (equalsIndex === -1) {
+    throw new Error(`Invalid env entry: ${line}`);
+  }
+
+  const key = withoutExport.slice(0, equalsIndex).trim();
+
+  if (!/^[A-Za-z_][A-Za-z0-9_.-]*$/.test(key)) {
+    throw new Error(`Invalid env key: ${key}`);
+  }
+
+  return {
+    key,
+    value: withoutExport.slice(equalsIndex + 1),
+  };
 }
 
 function parseEnvRecord(input: string): Record<string, string> {
   const normalizedInput = input.replace(/\r\n?/g, "\n");
   const values: Record<string, string> = {};
-  let lastMatchEnd = 0;
+  const lines = normalizedInput.split("\n");
 
-  for (const match of normalizedInput.matchAll(ENV_LINE)) {
-    const [fullMatch, key, rawValue = ""] = match;
-    const matchIndex = match.index ?? 0;
-    const gap = normalizedInput.slice(lastMatchEnd, matchIndex);
+  for (let index = 0; index < lines.length; index++) {
+    const line = lines[index];
+    const trimmedLine = line.trim();
 
-    if (!isIgnorableEnvGap(gap)) {
-      throw new Error(`Invalid env entry: ${gap.trim()}`);
+    if (trimmedLine.length === 0 || trimmedLine.startsWith("#")) {
+      continue;
     }
 
-    let value = rawValue.trim();
-    const maybeQuote = value[0];
+    const { key, value: rawValue } = parseEnvKeyAndValue(line);
+    const trimmedValue = rawValue.trim();
+    const openingQuote = trimmedValue[0];
 
-    if (
-      (maybeQuote === '"' || maybeQuote === "'" || maybeQuote === "`") &&
-      !/^(['"`])([\s\S]*)\1$/u.test(value)
-    ) {
-      throw new Error("Unterminated quoted env value");
+    if (openingQuote === '"' || openingQuote === "'" || openingQuote === "`") {
+      let buffer = "";
+      let remainder = trimmedValue.slice(1);
+      let closed = false;
+
+      while (true) {
+        let escaped = false;
+
+        for (let charIndex = 0; charIndex < remainder.length; charIndex++) {
+          const character = remainder[charIndex];
+
+          if (escaped) {
+            buffer += character;
+            escaped = false;
+            continue;
+          }
+
+          if (character === "\\") {
+            buffer += character;
+            escaped = true;
+            continue;
+          }
+
+          if (character === openingQuote) {
+            const trailing = remainder.slice(charIndex + 1).trim();
+
+            if (trailing.length > 0 && !trailing.startsWith("#")) {
+              throw new Error(`Invalid env entry: ${line}`);
+            }
+
+            closed = true;
+            break;
+          }
+
+          buffer += character;
+        }
+
+        if (closed) {
+          values[key] =
+            openingQuote === '"' ? buffer.replace(/\\n/g, "\n").replace(/\\r/g, "\r") : buffer;
+          break;
+        }
+
+        index += 1;
+
+        if (index >= lines.length) {
+          throw new Error("Unterminated quoted env value");
+        }
+
+        buffer += "\n";
+        remainder = lines[index];
+      }
+
+      continue;
     }
 
-    value = value.replace(/^(['"`])([\s\S]*)\1$/u, "$2");
-
-    if (maybeQuote === '"') {
-      value = value.replace(/\\n/g, "\n").replace(/\\r/g, "\r");
+    if (trimmedValue.length === 0 || trimmedValue.startsWith("#")) {
+      values[key] = "";
+      continue;
     }
 
-    values[key] = value;
-    lastMatchEnd = matchIndex + fullMatch.length;
-  }
-
-  const trailingSegment = normalizedInput.slice(lastMatchEnd);
-
-  if (!isIgnorableEnvGap(trailingSegment)) {
-    throw new Error(`Invalid env entry: ${trailingSegment.trim()}`);
+    const inlineCommentIndex = trimmedValue.search(/\s#/);
+    values[key] =
+      inlineCommentIndex === -1
+        ? trimmedValue
+        : trimmedValue.slice(0, inlineCommentIndex).trimEnd();
   }
 
   return values;

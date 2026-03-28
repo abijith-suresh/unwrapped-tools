@@ -118,6 +118,26 @@ describe("structured compare utilities", () => {
     });
   });
 
+  it("preserves hash characters inside unquoted env values", () => {
+    const result = normalizeEnvForDiff(
+      "PASSWORD=abc#123\nURL=https://example.com/#fragment\nTOKEN=abc\n"
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      output: "PASSWORD=abc#123\nTOKEN=abc\nURL=https://example.com/#fragment",
+    });
+  });
+
+  it("treats comment-only empty env values as empty strings", () => {
+    const result = normalizeEnvForDiff("EMPTY= # comment\nTOKEN=abc\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "EMPTY=\nTOKEN=abc",
+    });
+  });
+
   it("preserves multiline quoted env values", () => {
     const result = normalizeEnvForDiff('PRIVATE_KEY="line1\nline2"\nTOKEN=abc\n');
 
@@ -151,6 +171,15 @@ describe("structured compare utilities", () => {
     expect(result).toEqual({
       ok: true,
       output: "PRIVATE_KEY=line1\nline2\nTOKEN=abc",
+    });
+  });
+
+  it("accepts escaped single quotes inside single-quoted env values", () => {
+    const result = normalizeEnvForDiff("QUOTE_TEST='it\\'s fine'\nTOKEN=abc\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "QUOTE_TEST=it\\'s fine\nTOKEN=abc",
     });
   });
 
