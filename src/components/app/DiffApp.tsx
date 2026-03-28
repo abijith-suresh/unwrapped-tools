@@ -183,6 +183,9 @@ export default function DiffApp() {
             <Show when={preparedCompare()?.strategy === "yaml"}>
               <span class="font-mono text-xs text-cat-blue">Normalized YAML</span>
             </Show>
+            <Show when={preparedCompare()?.strategy === "env"}>
+              <span class="font-mono text-xs text-cat-blue">Normalized .env</span>
+            </Show>
             <Show when={diffData() && (stats().added > 0 || stats().removed > 0)}>
               <span class="font-mono text-xs text-cat-green">+{stats().added}</span>
               <span class="font-mono text-xs text-cat-red">-{stats().removed}</span>

@@ -2,6 +2,7 @@ export const SUPPORTED_LANGUAGES = [
   "text",
   "json",
   "yaml",
+  "env",
   "javascript",
   "typescript",
   "python",

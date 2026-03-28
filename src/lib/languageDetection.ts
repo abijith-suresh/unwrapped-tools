@@ -1,7 +1,7 @@
 import { type Language } from "./language";
 
 const EXTENSION_LANGUAGE_MAP: Record<string, Language> = {
-  ".env": "text",
+  ".env": "env",
   ".htm": "html",
   ".html": "html",
   ".js": "javascript",
@@ -25,7 +25,7 @@ function detectFromFilename(filename: string): Language | null {
   }
 
   if (lowerFilename === ".env" || lowerFilename.startsWith(".env.")) {
-    return "text";
+    return "env";
   }
 
   const extension = Object.keys(EXTENSION_LANGUAGE_MAP).find((candidate) =>
@@ -75,6 +75,18 @@ function detectFromContent(content: string): Language | null {
 
   if (/^\s*def\s+\w+\(/m.test(content) || /^\s*import\s+\w+/m.test(content)) {
     return "python";
+  }
+
+  const significantLines = content
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.startsWith("#"));
+
+  if (
+    significantLines.length > 1 &&
+    significantLines.every((line) => /^(export\s+)?[A-Za-z_][A-Za-z0-9_.-]*\s*=/.test(line))
+  ) {
+    return "env";
   }
 
   if (/^#\s+/m.test(content) || /```/.test(content)) {

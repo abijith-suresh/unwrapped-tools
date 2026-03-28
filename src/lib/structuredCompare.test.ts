@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  normalizeEnvForDiff,
   normalizeJsonForDiff,
   normalizeYamlForDiff,
   prepareStructuredCompare,
@@ -104,6 +105,104 @@ describe("structured compare utilities", () => {
       strategy: "yaml",
       errors: [],
     });
+  });
+
+  it("normalizes env files by sorting keys and ignoring comments", () => {
+    const result = normalizeEnvForDiff(
+      "# comment\nAPI_URL=https://example.com # prod\n export TOKEN = abc123 \n\nMODE=prod\n"
+    );
+
+    expect(result).toEqual({
+      ok: true,
+      output: "API_URL=https://example.com\nMODE=prod\nTOKEN=abc123",
+    });
+  });
+
+  it("preserves multiline quoted env values", () => {
+    const result = normalizeEnvForDiff('PRIVATE_KEY="line1\nline2"\nTOKEN=abc\n');
+
+    expect(result).toEqual({
+      ok: true,
+      output: "PRIVATE_KEY=line1\nline2\nTOKEN=abc",
+    });
+  });
+
+  it("accepts escaped quotes inside double-quoted env values", () => {
+    const result = normalizeEnvForDiff('QUOTE_TEST="a\\"b"\nTOKEN=abc\n');
+
+    expect(result).toEqual({
+      ok: true,
+      output: 'QUOTE_TEST=a\\"b\nTOKEN=abc',
+    });
+  });
+
+  it("accepts multiline single-quoted env values", () => {
+    const result = normalizeEnvForDiff("PRIVATE_KEY='line1\nline2'\nTOKEN=abc\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "PRIVATE_KEY=line1\nline2\nTOKEN=abc",
+    });
+  });
+
+  it("accepts dotted and dashed env keys", () => {
+    const result = normalizeEnvForDiff("FOO.BAR=baz\nFOO-BAR=qux\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "FOO-BAR=qux\nFOO.BAR=baz",
+    });
+  });
+
+  it("accepts multiline backtick-quoted env values", () => {
+    const result = normalizeEnvForDiff("PRIVATE_KEY=`line1\nline2`\nTOKEN=abc\n");
+
+    expect(result).toEqual({
+      ok: true,
+      output: "PRIVATE_KEY=line1\nline2\nTOKEN=abc",
+    });
+  });
+
+  it("accepts bare quote characters inside unquoted env values", () => {
+    const result = normalizeEnvForDiff('A=foo"bar\nTOKEN=abc\n');
+
+    expect(result).toEqual({
+      ok: true,
+      output: 'A=foo"bar\nTOKEN=abc',
+    });
+  });
+
+  it("uses normalized env output when both sides are env files", () => {
+    const result = prepareStructuredCompare({
+      original: "TOKEN=abc\nAPI_URL=https://example.com\n",
+      modified: "API_URL=https://example.com\nTOKEN=abc\n",
+      leftLanguage: "env",
+      rightLanguage: "env",
+    });
+
+    expect(result).toEqual({
+      original: "API_URL=https://example.com\nTOKEN=abc",
+      modified: "API_URL=https://example.com\nTOKEN=abc",
+      strategy: "env",
+      errors: [],
+    });
+  });
+
+  it("falls back to text diff and reports invalid env errors", () => {
+    const result = prepareStructuredCompare({
+      original: "INVALID LINE",
+      modified: "TOKEN=abc",
+      leftLanguage: "env",
+      rightLanguage: "env",
+    });
+
+    expect(result.strategy).toBe("text");
+    expect(result.errors).toEqual([
+      {
+        side: "left",
+        message: expect.any(String),
+      },
+    ]);
   });
 
   it("normalizes multi-document YAML consistently", () => {

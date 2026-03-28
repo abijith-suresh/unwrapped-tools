@@ -11,8 +11,8 @@ describe("language detection", () => {
   });
 
   it("treats env-style files as text to preserve raw diffing", () => {
-    expect(detectLanguage({ filename: ".env" })).toBe("text");
-    expect(detectLanguage({ filename: ".env.production" })).toBe("text");
+    expect(detectLanguage({ filename: ".env" })).toBe("env");
+    expect(detectLanguage({ filename: ".env.production" })).toBe("env");
   });
 
   it("falls back to JSON content detection when no filename is present", () => {
@@ -21,6 +21,12 @@ describe("language detection", () => {
 
   it("detects YAML-like content when no filename is present", () => {
     expect(detectLanguage({ content: "services:\n  api:\n    image: app:latest\n" })).toBe("yaml");
+  });
+
+  it("detects env content heuristically when it is just key-value pairs", () => {
+    expect(
+      detectLanguage({ content: "# comment\nAPI_URL=https://example.com\nTOKEN=abc123\n" })
+    ).toBe("env");
   });
 
   it("detects markup content heuristically", () => {

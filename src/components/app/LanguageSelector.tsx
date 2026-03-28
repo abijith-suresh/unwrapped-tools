@@ -5,12 +5,13 @@ export const LANGUAGES = [
   { value: SUPPORTED_LANGUAGES[0], label: "Plain text" },
   { value: SUPPORTED_LANGUAGES[1], label: "JSON" },
   { value: SUPPORTED_LANGUAGES[2], label: "YAML" },
-  { value: SUPPORTED_LANGUAGES[3], label: "JavaScript" },
-  { value: SUPPORTED_LANGUAGES[4], label: "TypeScript" },
-  { value: SUPPORTED_LANGUAGES[5], label: "Python" },
-  { value: SUPPORTED_LANGUAGES[6], label: "Markdown" },
-  { value: SUPPORTED_LANGUAGES[7], label: "XML" },
-  { value: SUPPORTED_LANGUAGES[8], label: "HTML" },
+  { value: SUPPORTED_LANGUAGES[3], label: ".env" },
+  { value: SUPPORTED_LANGUAGES[4], label: "JavaScript" },
+  { value: SUPPORTED_LANGUAGES[5], label: "TypeScript" },
+  { value: SUPPORTED_LANGUAGES[6], label: "Python" },
+  { value: SUPPORTED_LANGUAGES[7], label: "Markdown" },
+  { value: SUPPORTED_LANGUAGES[8], label: "XML" },
+  { value: SUPPORTED_LANGUAGES[9], label: "HTML" },
 ];
 
 interface Props {
