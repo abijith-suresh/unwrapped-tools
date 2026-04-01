@@ -171,7 +171,7 @@ export default function CommandPalette() {
       <button
         onClick={openPalette}
         aria-label="Open command palette"
-        class="inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80"
+        class="inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80 focus:outline-none"
         style={{
           "background-color": "var(--bg-secondary)",
           "border-color": "var(--border)",
