@@ -3,8 +3,11 @@ import { getToolBySlug, tools } from "@/tools/registry";
 import ToolShell from "@/components/ToolShell.astro";
 import Base64Tool from "@/tools/base64/Base64Tool";
 import DiffTool from "@/tools/diff/DiffTool";
+import HashGenerator from "@/tools/hash-generator/HashGenerator";
 import JsonFormatter from "@/tools/json-formatter/JsonFormatter";
 import JwtDecoder from "@/tools/jwt-decoder/JwtDecoder";
+import TimestampTool from "@/tools/timestamp/TimestampTool";
+import UuidGenerator from "@/tools/uuid-generator/UuidGenerator";
 
 export function getStaticPaths() {
   return tools.map((tool) => ({
@@ -30,6 +33,12 @@ if (!tool) {
       <Base64Tool client:load />
     ) : slug === "json-formatter" ? (
       <JsonFormatter client:load />
+    ) : slug === "hash-generator" ? (
+      <HashGenerator client:load />
+    ) : slug === "uuid-generator" ? (
+      <UuidGenerator client:load />
+    ) : slug === "timestamp" ? (
+      <TimestampTool client:load />
     ) : (
       <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
         <p style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
