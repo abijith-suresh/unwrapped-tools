@@ -1,6 +1,5 @@
 ---
-import { getToolBySlug, tools } from "@/tools/registry";
-import ToolShell from "@/components/ToolShell.astro";
+import EditorShell from "@/layouts/EditorShell.astro";
 import Base64Tool from "@/tools/base64/Base64Tool";
 import DiffTool from "@/tools/diff/DiffTool";
 import HashGenerator from "@/tools/hash-generator/HashGenerator";
@@ -9,6 +8,7 @@ import JwtDecoder from "@/tools/jwt-decoder/JwtDecoder";
 import RegexTester from "@/tools/regex-tester/RegexTester";
 import TimestampTool from "@/tools/timestamp/TimestampTool";
 import UuidGenerator from "@/tools/uuid-generator/UuidGenerator";
+import { getToolBySlug, tools } from "@/tools/registry";
 
 export function getStaticPaths() {
   return tools.map((tool) => ({
@@ -24,37 +24,111 @@ if (!tool) {
 }
 ---
 
-<ToolShell tool={tool}>
-  {
-    slug === "jwt-decoder" ? (
-      <JwtDecoder client:load />
-    ) : slug === "diff" ? (
-      <DiffTool client:load />
-    ) : slug === "base64" ? (
-      <Base64Tool client:load />
-    ) : slug === "json-formatter" ? (
-      <JsonFormatter client:load />
-    ) : slug === "hash-generator" ? (
-      <HashGenerator client:load />
-    ) : slug === "uuid-generator" ? (
-      <UuidGenerator client:load />
-    ) : slug === "timestamp" ? (
-      <TimestampTool client:load />
-    ) : slug === "regex-tester" ? (
-      <RegexTester client:load />
-    ) : (
-      <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
-        <p style="font-size: 1.25rem; font-weight: 600; color: var(--text-primary); margin-bottom: 0.5rem;">
-          {tool.name}
-        </p>
-        <p>This tool is coming soon.</p>
-        <a
-          href="/"
-          style="color: var(--accent-primary); text-decoration: none; margin-top: 1rem; display: inline-block;"
-        >
-          &larr; Back to all tools
-        </a>
-      </div>
-    )
+<EditorShell title={tool.name} description={tool.description} activeSlug={tool.slug}>
+  <div class="tool-pane">
+    <!-- Minimal comment header — stays in editor metaphor -->
+    <div class="tool-header">
+      <span class="tool-comment">// </span><span class="tool-title">{tool.name}</span><span
+        class="tool-comment"
+      >
+        — {tool.description}</span
+      >
+    </div>
+
+    <!-- Tool component -->
+    <div class="tool-body">
+      {
+        slug === "jwt-decoder" ? (
+          <JwtDecoder client:load />
+        ) : slug === "diff" ? (
+          <DiffTool client:load />
+        ) : slug === "base64" ? (
+          <Base64Tool client:load />
+        ) : slug === "json-formatter" ? (
+          <JsonFormatter client:load />
+        ) : slug === "hash-generator" ? (
+          <HashGenerator client:load />
+        ) : slug === "uuid-generator" ? (
+          <UuidGenerator client:load />
+        ) : slug === "timestamp" ? (
+          <TimestampTool client:load />
+        ) : slug === "regex-tester" ? (
+          <RegexTester client:load />
+        ) : (
+          <div class="tool-coming-soon">
+            <p class="tool-soon-name">{tool.name}</p>
+            <p>This tool is coming soon.</p>
+            <a href="/" class="tool-soon-link">
+              &larr; Back to all tools
+            </a>
+          </div>
+        )
+      }
+    </div>
+  </div>
+</EditorShell>
+
+<style>
+  .tool-pane {
+    display: flex;
+    flex-direction: column;
+    min-height: 100%;
+    font-family: var(--font-mono);
   }
-</ToolShell>
+
+  .tool-header {
+    padding: 0.75rem 1.5rem 0.5rem;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    border-bottom: 1px solid var(--border);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tool-comment {
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .tool-title {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .tool-body {
+    flex: 1;
+    padding: 1.5rem;
+  }
+
+  .tool-coming-soon {
+    padding: 2rem;
+    text-align: center;
+    color: var(--text-muted);
+  }
+
+  .tool-soon-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .tool-soon-link {
+    color: var(--accent-primary);
+    text-decoration: none;
+    margin-top: 1rem;
+    display: inline-block;
+  }
+
+  @media (max-width: 600px) {
+    .tool-body {
+      padding: 1rem;
+    }
+
+    .tool-header {
+      padding: 0.6rem 1rem 0.4rem;
+      font-size: 0.75rem;
+    }
+  }
+</style>
