@@ -87,13 +87,13 @@ export default function CommandPalette() {
       setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const rlen = results().length;
-      if (selectedIndex() < rlen) {
-        const tool = results()[selectedIndex()];
-        if (tool) navigateTo(tool.slug);
-      } else if (showPreferences() && selectedIndex() === rlen) {
+      if (showPreferences() && selectedIndex() === 0) {
         closePalette();
         document.dispatchEvent(new CustomEvent("open-settings"));
+      } else {
+        const toolIndex = selectedIndex() - (showPreferences() ? 1 : 0);
+        const tool = results()[toolIndex];
+        if (tool) navigateTo(tool.slug);
       }
     } else if (e.key === "Escape") {
       e.preventDefault();
@@ -221,7 +221,7 @@ export default function CommandPalette() {
                 value={query()}
                 onInput={(e) => setQuery(e.currentTarget.value)}
                 class="flex-1 bg-transparent text-sm outline-none placeholder:text-[color:var(--text-muted)]"
-                style={{ color: "var(--text-primary)" }}
+                style={{ color: "var(--text-primary)", outline: "none" }}
                 aria-label="Search tools"
                 autocomplete="off"
                 spellcheck={false}
@@ -246,135 +246,35 @@ export default function CommandPalette() {
               role="listbox"
               aria-label="Tool results"
             >
-              <Show
-                when={results().length > 0}
-                fallback={
-                  <li class="px-4 py-8 text-center text-sm" style={{ color: "var(--text-muted)" }}>
-                    No tools found for &ldquo;{query()}&rdquo;
-                  </li>
-                }
-              >
-                <For each={results()}>
-                  {(tool, index) => (
-                    <li
-                      role="option"
-                      aria-selected={selectedIndex() === index()}
-                      onClick={() => navigateTo(tool.slug)}
-                      onMouseEnter={() => setSelectedIndex(index())}
-                      class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
-                      style={{
-                        "background-color":
-                          selectedIndex() === index()
-                            ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
-                            : "transparent",
-                        "border-left":
-                          selectedIndex() === index()
-                            ? "2px solid var(--accent-primary)"
-                            : "2px solid transparent",
-                        "padding-left":
-                          selectedIndex() === index() ? "calc(0.75rem - 2px)" : "0.75rem",
-                      }}
-                    >
-                      {/* Icon */}
-                      <span
-                        style={{
-                          color:
-                            selectedIndex() === index()
-                              ? "var(--accent-primary)"
-                              : "var(--text-secondary)",
-                          "flex-shrink": "0",
-                          display: "flex",
-                        }}
-                      >
-                        <ToolIcon name={tool.icon} size={16} />
-                      </span>
-
-                      {/* Text */}
-                      <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-2">
-                          <span
-                            class="text-sm font-semibold"
-                            style={{ color: "var(--text-primary)" }}
-                          >
-                            {tool.name}
-                          </span>
-                          <span
-                            class="text-[10px] font-medium uppercase tracking-wide"
-                            style={{ color: "var(--text-muted)" }}
-                          >
-                            {tool.category}
-                          </span>
-                          <Show when={tool.isNew}>
-                            <span
-                              class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                              style={{
-                                "background-color":
-                                  "color-mix(in srgb, var(--accent-primary) 20%, transparent)",
-                                color: "var(--accent-primary)",
-                              }}
-                            >
-                              New
-                            </span>
-                          </Show>
-                        </div>
-                        <p
-                          class="mt-0.5 truncate text-[12px]"
-                          style={{ color: "var(--text-muted)" }}
-                        >
-                          {tool.description}
-                        </p>
-                      </div>
-
-                      {/* Enter hint */}
-                      <Show when={selectedIndex() === index()}>
-                        <kbd
-                          class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
-                          style={{
-                            "background-color": "var(--bg-primary)",
-                            border: "1px solid var(--border)",
-                            color: "var(--text-muted)",
-                          }}
-                        >
-                          ↵
-                        </kbd>
-                      </Show>
-                    </li>
-                  )}
-                </For>
-              </Show>
-
-              {/* Preferences command */}
+              {/* Preferences command — always first */}
               <Show when={showPreferences()}>
                 <li
                   role="option"
-                  aria-selected={selectedIndex() === results().length}
+                  aria-selected={selectedIndex() === 0}
                   onClick={() => {
                     closePalette();
                     document.dispatchEvent(new CustomEvent("open-settings"));
                   }}
-                  onMouseEnter={() => setSelectedIndex(results().length)}
+                  onMouseEnter={() => setSelectedIndex(0)}
                   class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
                   style={{
                     "background-color":
-                      selectedIndex() === results().length
+                      selectedIndex() === 0
                         ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
                         : "transparent",
                     "border-left":
-                      selectedIndex() === results().length
+                      selectedIndex() === 0
                         ? "2px solid var(--accent-primary)"
                         : "2px solid transparent",
-                    "border-top": "1px solid var(--border)",
-                    "padding-left":
-                      selectedIndex() === results().length ? "calc(0.75rem - 2px)" : "0.75rem",
+                    "border-bottom": "1px solid var(--border)",
+                    "padding-left": selectedIndex() === 0 ? "calc(0.75rem - 2px)" : "0.75rem",
                   }}
                 >
                   {/* Icon */}
                   <span
                     style={{
                       color:
-                        selectedIndex() === results().length
-                          ? "var(--accent-primary)"
-                          : "var(--text-secondary)",
+                        selectedIndex() === 0 ? "var(--accent-primary)" : "var(--text-secondary)",
                       "flex-shrink": "0",
                       display: "flex",
                     }}
@@ -395,7 +295,7 @@ export default function CommandPalette() {
                   </div>
 
                   {/* Enter hint */}
-                  <Show when={selectedIndex() === results().length}>
+                  <Show when={selectedIndex() === 0}>
                     <kbd
                       class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
                       style={{
@@ -408,6 +308,106 @@ export default function CommandPalette() {
                     </kbd>
                   </Show>
                 </li>
+              </Show>
+
+              <Show
+                when={results().length > 0}
+                fallback={
+                  <li class="px-4 py-8 text-center text-sm" style={{ color: "var(--text-muted)" }}>
+                    No tools found for &ldquo;{query()}&rdquo;
+                  </li>
+                }
+              >
+                <For each={results()}>
+                  {(tool, index) => {
+                    const itemIndex = () => index() + (showPreferences() ? 1 : 0);
+                    return (
+                      <li
+                        role="option"
+                        aria-selected={selectedIndex() === itemIndex()}
+                        onClick={() => navigateTo(tool.slug)}
+                        onMouseEnter={() => setSelectedIndex(itemIndex())}
+                        class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
+                        style={{
+                          "background-color":
+                            selectedIndex() === itemIndex()
+                              ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+                              : "transparent",
+                          "border-left":
+                            selectedIndex() === itemIndex()
+                              ? "2px solid var(--accent-primary)"
+                              : "2px solid transparent",
+                          "padding-left":
+                            selectedIndex() === itemIndex() ? "calc(0.75rem - 2px)" : "0.75rem",
+                        }}
+                      >
+                        {/* Icon */}
+                        <span
+                          style={{
+                            color:
+                              selectedIndex() === itemIndex()
+                                ? "var(--accent-primary)"
+                                : "var(--text-secondary)",
+                            "flex-shrink": "0",
+                            display: "flex",
+                          }}
+                        >
+                          <ToolIcon name={tool.icon} size={16} />
+                        </span>
+
+                        {/* Text */}
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center gap-2">
+                            <span
+                              class="text-sm font-semibold"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {tool.name}
+                            </span>
+                            <span
+                              class="text-[10px] font-medium uppercase tracking-wide"
+                              style={{ color: "var(--text-muted)" }}
+                            >
+                              {tool.category}
+                            </span>
+                            <Show when={tool.isNew}>
+                              <span
+                                class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                                style={{
+                                  "background-color":
+                                    "color-mix(in srgb, var(--accent-primary) 20%, transparent)",
+                                  color: "var(--accent-primary)",
+                                }}
+                              >
+                                New
+                              </span>
+                            </Show>
+                          </div>
+                          <p
+                            class="mt-0.5 truncate text-[12px]"
+                            style={{ color: "var(--text-muted)" }}
+                          >
+                            {tool.description}
+                          </p>
+                        </div>
+
+                        {/* Enter hint */}
+                        <Show when={selectedIndex() === itemIndex()}>
+                          <kbd
+                            class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
+                            style={{
+                              "background-color": "var(--bg-primary)",
+                              border: "1px solid var(--border)",
+                              color: "var(--text-muted)",
+                            }}
+                          >
+                            ↵
+                          </kbd>
+                        </Show>
+                      </li>
+                    );
+                  }}
+                </For>
               </Show>
             </ul>
           </div>
