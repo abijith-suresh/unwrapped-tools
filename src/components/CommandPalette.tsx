@@ -177,7 +177,7 @@ export default function CommandPalette() {
         {/* Backdrop */}
         <div
           class="fixed inset-0 z-50 flex items-start justify-center pt-[12vh]"
-          style={{ "background-color": "rgba(0, 0, 0, 0.6)" }}
+          style={{ "background-color": "rgba(0, 0, 0, 0.4)" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) closePalette();
           }}
@@ -187,7 +187,7 @@ export default function CommandPalette() {
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            class="flex w-full max-w-[600px] flex-col overflow-hidden rounded-xl shadow-2xl"
+            class="flex w-full max-w-[600px] flex-col overflow-hidden rounded-md shadow-2xl"
             style={{
               "background-color": "var(--bg-secondary)",
               border: "1px solid var(--border)",
@@ -248,25 +248,29 @@ export default function CommandPalette() {
                       aria-selected={selectedIndex() === index()}
                       onClick={() => navigateTo(tool.slug)}
                       onMouseEnter={() => setSelectedIndex(index())}
-                      class="mx-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors"
-                      style={
-                        selectedIndex() === index()
-                          ? {
-                              "background-color":
-                                "color-mix(in srgb, var(--accent-primary) 15%, transparent)",
-                            }
-                          : {}
-                      }
+                      class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
+                      style={{
+                        "background-color":
+                          selectedIndex() === index()
+                            ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+                            : "transparent",
+                        "border-left":
+                          selectedIndex() === index()
+                            ? "2px solid var(--accent-primary)"
+                            : "2px solid transparent",
+                        "padding-left":
+                          selectedIndex() === index() ? "calc(0.75rem - 2px)" : "0.75rem",
+                      }}
                     >
                       {/* Icon */}
                       <span
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
                         style={{
-                          "background-color": "var(--bg-primary)",
                           color:
                             selectedIndex() === index()
                               ? "var(--accent-primary)"
-                              : "var(--text-muted)",
+                              : "var(--text-secondary)",
+                          "flex-shrink": "0",
+                          display: "flex",
                         }}
                       >
                         <ToolIcon name={tool.icon} size={16} />
@@ -282,11 +286,8 @@ export default function CommandPalette() {
                             {tool.name}
                           </span>
                           <span
-                            class="rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
-                            style={{
-                              "background-color": "var(--bg-primary)",
-                              color: "var(--text-muted)",
-                            }}
+                            class="text-[10px] font-medium uppercase tracking-wide"
+                            style={{ color: "var(--text-muted)" }}
                           >
                             {tool.category}
                           </span>
@@ -303,7 +304,10 @@ export default function CommandPalette() {
                             </span>
                           </Show>
                         </div>
-                        <p class="mt-0.5 truncate text-xs" style={{ color: "var(--text-muted)" }}>
+                        <p
+                          class="mt-0.5 truncate text-[12px]"
+                          style={{ color: "var(--text-muted)" }}
+                        >
                           {tool.description}
                         </p>
                       </div>
