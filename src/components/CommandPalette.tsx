@@ -7,6 +7,7 @@ import {
   KeyRound,
   Regex,
   Search,
+  Settings,
   Shuffle,
 } from "lucide-solid";
 import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid-js";
@@ -39,6 +40,12 @@ export default function CommandPalette() {
   const [selectedIndex, setSelectedIndex] = createSignal(0);
   const [results, setResults] = createSignal<Tool[]>(tools);
 
+  // Show Preferences command when query is empty or matches settings-related terms
+  const showPreferences = () => query() === "" || /settings|preferences|theme|color/i.test(query());
+
+  // Total navigable items = tool results + Preferences (when shown)
+  const totalItems = () => results().length + (showPreferences() ? 1 : 0);
+
   // eslint-disable-next-line no-unassigned-vars
   let inputRef: HTMLInputElement | undefined;
   // eslint-disable-next-line no-unassigned-vars
@@ -70,7 +77,7 @@ export default function CommandPalette() {
   function handleKeyDown(e: KeyboardEvent) {
     if (!open()) return;
 
-    const len = results().length;
+    const len = totalItems();
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -80,8 +87,14 @@ export default function CommandPalette() {
       setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const tool = results()[selectedIndex()];
-      if (tool) navigateTo(tool.slug);
+      if (showPreferences() && selectedIndex() === 0) {
+        closePalette();
+        document.dispatchEvent(new CustomEvent("open-settings"));
+      } else {
+        const toolIndex = selectedIndex() - (showPreferences() ? 1 : 0);
+        const tool = results()[toolIndex];
+        if (tool) navigateTo(tool.slug);
+      }
     } else if (e.key === "Escape") {
       e.preventDefault();
       closePalette();
@@ -137,7 +150,7 @@ export default function CommandPalette() {
       <button
         onClick={openPalette}
         aria-label="Open command palette"
-        class="inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80"
+        class="inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition-opacity hover:opacity-80 focus:outline-none"
         style={{
           "background-color": "var(--bg-secondary)",
           "border-color": "var(--border)",
@@ -146,17 +159,30 @@ export default function CommandPalette() {
       >
         <Search size={12} />
         <span>Search</span>
-        <kbd
-          class="rounded px-1 py-0.5 text-[10px] font-mono"
-          style={{
-            "background-color": "var(--bg-primary)",
-            "border-color": "var(--border)",
-            color: "var(--text-muted)",
-            border: "1px solid var(--border)",
-          }}
-        >
-          ⌘K
-        </kbd>
+        <span class="flex items-center gap-0.5">
+          <kbd
+            class="rounded px-1 py-0.5 text-[10px] font-mono"
+            style={{
+              "background-color": "var(--bg-primary)",
+              "border-color": "var(--border)",
+              color: "var(--text-muted)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            ⌘
+          </kbd>
+          <kbd
+            class="rounded px-1 py-0.5 text-[10px] font-mono"
+            style={{
+              "background-color": "var(--bg-primary)",
+              "border-color": "var(--border)",
+              color: "var(--text-muted)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            K
+          </kbd>
+        </span>
       </button>
 
       {/* Overlay + Modal */}
@@ -164,7 +190,7 @@ export default function CommandPalette() {
         {/* Backdrop */}
         <div
           class="fixed inset-0 z-50 flex items-start justify-center pt-[12vh]"
-          style={{ "background-color": "rgba(0, 0, 0, 0.6)" }}
+          style={{ "background-color": "rgba(0, 0, 0, 0.4)" }}
           onClick={(e) => {
             if (e.target === e.currentTarget) closePalette();
           }}
@@ -174,7 +200,7 @@ export default function CommandPalette() {
             role="dialog"
             aria-modal="true"
             aria-label="Command palette"
-            class="flex w-full max-w-[600px] flex-col overflow-hidden rounded-xl shadow-2xl"
+            class="flex w-full max-w-[600px] flex-col overflow-hidden rounded-md shadow-2xl"
             style={{
               "background-color": "var(--bg-secondary)",
               border: "1px solid var(--border)",
@@ -195,7 +221,7 @@ export default function CommandPalette() {
                 value={query()}
                 onInput={(e) => setQuery(e.currentTarget.value)}
                 class="flex-1 bg-transparent text-sm outline-none placeholder:text-[color:var(--text-muted)]"
-                style={{ color: "var(--text-primary)" }}
+                style={{ color: "var(--text-primary)", outline: "none" }}
                 aria-label="Search tools"
                 autocomplete="off"
                 spellcheck={false}
@@ -220,6 +246,70 @@ export default function CommandPalette() {
               role="listbox"
               aria-label="Tool results"
             >
+              {/* Preferences command — always first */}
+              <Show when={showPreferences()}>
+                <li
+                  role="option"
+                  aria-selected={selectedIndex() === 0}
+                  onClick={() => {
+                    closePalette();
+                    document.dispatchEvent(new CustomEvent("open-settings"));
+                  }}
+                  onMouseEnter={() => setSelectedIndex(0)}
+                  class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
+                  style={{
+                    "background-color":
+                      selectedIndex() === 0
+                        ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+                        : "transparent",
+                    "border-left":
+                      selectedIndex() === 0
+                        ? "2px solid var(--accent-primary)"
+                        : "2px solid transparent",
+                    "border-bottom": "1px solid var(--border)",
+                    "padding-left": selectedIndex() === 0 ? "calc(0.75rem - 2px)" : "0.75rem",
+                  }}
+                >
+                  {/* Icon */}
+                  <span
+                    style={{
+                      color:
+                        selectedIndex() === 0 ? "var(--accent-primary)" : "var(--text-secondary)",
+                      "flex-shrink": "0",
+                      display: "flex",
+                    }}
+                  >
+                    <Settings size={16} />
+                  </span>
+
+                  {/* Text */}
+                  <div class="min-w-0 flex-1">
+                    <div class="flex items-center gap-2">
+                      <span class="text-sm font-semibold" style={{ color: "var(--text-primary)" }}>
+                        Preferences
+                      </span>
+                    </div>
+                    <p class="mt-0.5 truncate text-[12px]" style={{ color: "var(--text-muted)" }}>
+                      Color theme, keyboard shortcuts &amp; more
+                    </p>
+                  </div>
+
+                  {/* Enter hint */}
+                  <Show when={selectedIndex() === 0}>
+                    <kbd
+                      class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
+                      style={{
+                        "background-color": "var(--bg-primary)",
+                        border: "1px solid var(--border)",
+                        color: "var(--text-muted)",
+                      }}
+                    >
+                      ↵
+                    </kbd>
+                  </Show>
+                </li>
+              </Show>
+
               <Show
                 when={results().length > 0}
                 fallback={
@@ -229,87 +319,94 @@ export default function CommandPalette() {
                 }
               >
                 <For each={results()}>
-                  {(tool, index) => (
-                    <li
-                      role="option"
-                      aria-selected={selectedIndex() === index()}
-                      onClick={() => navigateTo(tool.slug)}
-                      onMouseEnter={() => setSelectedIndex(index())}
-                      class="mx-1 flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors"
-                      style={
-                        selectedIndex() === index()
-                          ? {
-                              "background-color":
-                                "color-mix(in srgb, var(--accent-primary) 15%, transparent)",
-                            }
-                          : {}
-                      }
-                    >
-                      {/* Icon */}
-                      <span
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-md"
+                  {(tool, index) => {
+                    const itemIndex = () => index() + (showPreferences() ? 1 : 0);
+                    return (
+                      <li
+                        role="option"
+                        aria-selected={selectedIndex() === itemIndex()}
+                        onClick={() => navigateTo(tool.slug)}
+                        onMouseEnter={() => setSelectedIndex(itemIndex())}
+                        class="flex cursor-pointer items-center gap-3 rounded-none px-3 py-2 transition-colors"
                         style={{
-                          "background-color": "var(--bg-primary)",
-                          color:
-                            selectedIndex() === index()
-                              ? "var(--accent-primary)"
-                              : "var(--text-muted)",
+                          "background-color":
+                            selectedIndex() === itemIndex()
+                              ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+                              : "transparent",
+                          "border-left":
+                            selectedIndex() === itemIndex()
+                              ? "2px solid var(--accent-primary)"
+                              : "2px solid transparent",
+                          "padding-left":
+                            selectedIndex() === itemIndex() ? "calc(0.75rem - 2px)" : "0.75rem",
                         }}
                       >
-                        <ToolIcon name={tool.icon} size={16} />
-                      </span>
+                        {/* Icon */}
+                        <span
+                          style={{
+                            color:
+                              selectedIndex() === itemIndex()
+                                ? "var(--accent-primary)"
+                                : "var(--text-secondary)",
+                            "flex-shrink": "0",
+                            display: "flex",
+                          }}
+                        >
+                          <ToolIcon name={tool.icon} size={16} />
+                        </span>
 
-                      {/* Text */}
-                      <div class="min-w-0 flex-1">
-                        <div class="flex items-center gap-2">
-                          <span
-                            class="text-sm font-semibold"
-                            style={{ color: "var(--text-primary)" }}
+                        {/* Text */}
+                        <div class="min-w-0 flex-1">
+                          <div class="flex items-center gap-2">
+                            <span
+                              class="text-sm font-semibold"
+                              style={{ color: "var(--text-primary)" }}
+                            >
+                              {tool.name}
+                            </span>
+                            <span
+                              class="text-[10px] font-medium uppercase tracking-wide"
+                              style={{ color: "var(--text-muted)" }}
+                            >
+                              {tool.category}
+                            </span>
+                            <Show when={tool.isNew}>
+                              <span
+                                class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
+                                style={{
+                                  "background-color":
+                                    "color-mix(in srgb, var(--accent-primary) 20%, transparent)",
+                                  color: "var(--accent-primary)",
+                                }}
+                              >
+                                New
+                              </span>
+                            </Show>
+                          </div>
+                          <p
+                            class="mt-0.5 truncate text-[12px]"
+                            style={{ color: "var(--text-muted)" }}
                           >
-                            {tool.name}
-                          </span>
-                          <span
-                            class="rounded px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide"
+                            {tool.description}
+                          </p>
+                        </div>
+
+                        {/* Enter hint */}
+                        <Show when={selectedIndex() === itemIndex()}>
+                          <kbd
+                            class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
                             style={{
                               "background-color": "var(--bg-primary)",
+                              border: "1px solid var(--border)",
                               color: "var(--text-muted)",
                             }}
                           >
-                            {tool.category}
-                          </span>
-                          <Show when={tool.isNew}>
-                            <span
-                              class="rounded px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
-                              style={{
-                                "background-color":
-                                  "color-mix(in srgb, var(--accent-primary) 20%, transparent)",
-                                color: "var(--accent-primary)",
-                              }}
-                            >
-                              New
-                            </span>
-                          </Show>
-                        </div>
-                        <p class="mt-0.5 truncate text-xs" style={{ color: "var(--text-muted)" }}>
-                          {tool.description}
-                        </p>
-                      </div>
-
-                      {/* Enter hint */}
-                      <Show when={selectedIndex() === index()}>
-                        <kbd
-                          class="hidden shrink-0 rounded px-1.5 py-0.5 text-[10px] font-mono sm:block"
-                          style={{
-                            "background-color": "var(--bg-primary)",
-                            border: "1px solid var(--border)",
-                            color: "var(--text-muted)",
-                          }}
-                        >
-                          ↵
-                        </kbd>
-                      </Show>
-                    </li>
-                  )}
+                            ↵
+                          </kbd>
+                        </Show>
+                      </li>
+                    );
+                  }}
                 </For>
               </Show>
             </ul>

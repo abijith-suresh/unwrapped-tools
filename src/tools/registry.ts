@@ -27,7 +27,6 @@ export const tools: Tool[] = [
     keywords: ["jwt", "token", "bearer", "auth", "decode", "json web token"],
     icon: "KeyRound",
     slug: "jwt-decoder",
-    isNew: true,
   },
   {
     id: "diff",

@@ -2,7 +2,7 @@
 import { ViewTransitions } from "astro:transitions";
 
 import CommandPalette from "@/components/CommandPalette";
-import ThemePicker from "@/components/ThemePicker";
+import SettingsModal from "@/components/SettingsModal";
 import "@/styles/global.css";
 import { tools } from "@/tools/registry";
 import type { ToolCategory } from "@/tools/registry";
@@ -88,7 +88,7 @@ const grouped: GroupedTool[] = categoryOrder
         const stored = localStorage.getItem("unwrapped-theme");
         const theme = ["dracula", "catppuccin", "nord", "gruvbox"].includes(stored)
           ? stored
-          : "dracula";
+          : "catppuccin";
         document.documentElement.setAttribute("data-theme", theme);
       })();
     </script>
@@ -217,8 +217,7 @@ const grouped: GroupedTool[] = categoryOrder
         </div>
 
         <div class="status-right">
-          <span class="status-item status-theme-label">Color Theme:</span>
-          <ThemePicker client:load />
+          <SettingsModal client:load />
           <span class="status-sep" aria-hidden="true">|</span>
           <span class="status-item status-gh">
             <a
@@ -565,10 +564,6 @@ const grouped: GroupedTool[] = categoryOrder
 
         .status-ts-sep,
         .status-ts {
-          display: none;
-        }
-
-        .status-theme-label {
           display: none;
         }
       }
