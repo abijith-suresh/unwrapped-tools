@@ -13,7 +13,16 @@ import { createEffect, createSignal, For, onCleanup, onMount, Show } from "solid
 import type { JSX } from "solid-js";
 
 import { searchTools } from "@/lib/search";
+import { getTheme, setTheme, type ThemeName, THEMES } from "@/lib/theme";
 import { type Tool, tools } from "@/tools/registry";
+
+// Hardcoded accent hex values for cross-theme color dot previews (explicitly allowed)
+const THEME_ACCENTS: Record<string, string> = {
+  dracula: "#bd93f9",
+  catppuccin: "#cba6f7",
+  nord: "#88c0d0",
+  gruvbox: "#d3869b",
+};
 
 // Map of lucide icon name → component
 const ICON_MAP: Record<string, (props: { size?: number; class?: string }) => JSX.Element> = {
@@ -38,11 +47,21 @@ export default function CommandPalette() {
   const [query, setQuery] = createSignal("");
   const [selectedIndex, setSelectedIndex] = createSignal(0);
   const [results, setResults] = createSignal<Tool[]>(tools);
+  const [activeTheme, setActiveTheme] = createSignal<ThemeName>(getTheme());
 
   // eslint-disable-next-line no-unassigned-vars
   let inputRef: HTMLInputElement | undefined;
   // eslint-disable-next-line no-unassigned-vars
   let listRef: HTMLUListElement | undefined;
+
+  // Show theme section when query is empty or matches theme-related terms
+  const showThemeSection = () => {
+    const q = query().toLowerCase();
+    return q === "" || /theme|color|dracula|catppuccin|nord|gruvbox/.test(q);
+  };
+
+  // Total navigable items = tool results + (theme rows when section visible)
+  const totalItems = () => results().length + (showThemeSection() ? THEMES.length : 0);
 
   // Update results when query changes
   createEffect(() => {
@@ -70,7 +89,7 @@ export default function CommandPalette() {
   function handleKeyDown(e: KeyboardEvent) {
     if (!open()) return;
 
-    const len = results().length;
+    const len = totalItems();
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -80,8 +99,18 @@ export default function CommandPalette() {
       setSelectedIndex((i) => Math.max(i - 1, 0));
     } else if (e.key === "Enter") {
       e.preventDefault();
-      const tool = results()[selectedIndex()];
-      if (tool) navigateTo(tool.slug);
+      const rlen = results().length;
+      if (selectedIndex() < rlen) {
+        const tool = results()[selectedIndex()];
+        if (tool) navigateTo(tool.slug);
+      } else if (showThemeSection()) {
+        const themeIdx = selectedIndex() - rlen;
+        const theme = THEMES[themeIdx];
+        if (theme) {
+          setTheme(theme.name);
+          setActiveTheme(theme.name);
+        }
+      }
     } else if (e.key === "Escape") {
       e.preventDefault();
       closePalette();
@@ -123,10 +152,15 @@ export default function CommandPalette() {
   });
 
   // Scroll selected item into view
+  // Theme section header row (aria-hidden, non-interactive) sits between tool rows and theme rows.
+  // We offset by 1 to skip it when scrolling to theme rows.
   createEffect(() => {
     const idx = selectedIndex();
+    const rlen = results().length;
     if (listRef) {
-      const item = listRef.children[idx] as HTMLElement | undefined;
+      // If index is in tool rows, scroll directly; if in theme rows, offset +1 for header li
+      const domIdx = idx < rlen ? idx : idx + 1;
+      const item = listRef.children[domIdx] as HTMLElement | undefined;
       item?.scrollIntoView({ block: "nearest" });
     }
   });
@@ -327,6 +361,81 @@ export default function CommandPalette() {
                       </Show>
                     </li>
                   )}
+                </For>
+              </Show>
+
+              {/* COLOR THEME section */}
+              <Show when={showThemeSection()}>
+                {/* Section header — non-interactive, skipped by arrow key nav */}
+                <li
+                  class="px-3 py-1"
+                  style={{
+                    "border-top": "1px solid var(--border)",
+                    "background-color": "var(--bg-tertiary)",
+                  }}
+                  aria-hidden="true"
+                >
+                  <span
+                    class="text-[10px] font-semibold uppercase tracking-widest"
+                    style={{ color: "var(--text-muted)" }}
+                  >
+                    COLOR THEME
+                  </span>
+                </li>
+                <For each={THEMES}>
+                  {(theme, themeIndex) => {
+                    const itemIndex = () => results().length + themeIndex();
+                    const isActive = () => activeTheme() === theme.name;
+                    const isSelected = () => selectedIndex() === itemIndex();
+                    return (
+                      <li
+                        role="option"
+                        aria-selected={isSelected()}
+                        onClick={() => {
+                          setTheme(theme.name);
+                          setActiveTheme(theme.name);
+                          setSelectedIndex(itemIndex());
+                        }}
+                        onMouseEnter={() => setSelectedIndex(itemIndex())}
+                        class="flex cursor-pointer items-center gap-3 rounded-none py-2 transition-colors"
+                        style={{
+                          "background-color": isSelected()
+                            ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+                            : "transparent",
+                          "border-left": isSelected()
+                            ? "2px solid var(--accent-primary)"
+                            : "2px solid transparent",
+                          "padding-left": isSelected() ? "calc(0.75rem - 2px)" : "0.75rem",
+                          "padding-right": "0.75rem",
+                        }}
+                      >
+                        {/* Color dot */}
+                        <span
+                          style={{
+                            display: "inline-block",
+                            width: "12px",
+                            height: "12px",
+                            "border-radius": "50%",
+                            "background-color": THEME_ACCENTS[theme.name],
+                            "flex-shrink": "0",
+                          }}
+                        />
+                        {/* Theme name */}
+                        <span
+                          class="flex-1 text-sm font-semibold"
+                          style={{ color: "var(--text-primary)" }}
+                        >
+                          {theme.label}
+                        </span>
+                        {/* Active checkmark */}
+                        <Show when={isActive()}>
+                          <span class="text-sm" style={{ color: "var(--accent-primary)" }}>
+                            ✓
+                          </span>
+                        </Show>
+                      </li>
+                    );
+                  }}
                 </For>
               </Show>
             </ul>
