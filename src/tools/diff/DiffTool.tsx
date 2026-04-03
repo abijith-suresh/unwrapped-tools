@@ -14,9 +14,10 @@ import { createDiffAnalysisExecutor } from "@/lib/diffExecution";
 import { DEFAULT_IMPORT_MAX_BYTES, formatBytes, readImportedFile } from "@/lib/fileImport";
 import { type Language, SUPPORTED_LANGUAGES } from "@/lib/language";
 import { detectLanguage } from "@/lib/languageDetection";
+import { DIFF_SESSION_STORAGE_KEY } from "@/lib/localPersistence";
 import { clearSessionState, loadSessionState, saveSessionState } from "@/lib/session";
 import {
-  DIFF_SESSION_STORAGE_KEY,
+  DEFAULT_DIFF_SESSION_STATE,
   DIFF_SESSION_VERSION,
   type DiffFileMeta,
   isDiffSessionState,
@@ -312,6 +313,26 @@ export default function DiffTool() {
       key: DIFF_SESSION_STORAGE_KEY,
       version: DIFF_SESSION_VERSION,
       isData: isDiffSessionState,
+      migrate: (value, fromVersion) => {
+        if (fromVersion !== 1 || typeof value !== "object" || value === null) {
+          return null;
+        }
+
+        const legacy = value as Record<string, unknown>;
+        if (
+          typeof legacy.leftLang !== "string" ||
+          typeof legacy.rightLang !== "string" ||
+          typeof legacy.changesOnly !== "boolean"
+        ) {
+          return null;
+        }
+
+        return {
+          leftLang: legacy.leftLang as Language,
+          rightLang: legacy.rightLang as Language,
+          changesOnly: legacy.changesOnly,
+        };
+      },
     });
 
     if (!savedSession) {
@@ -319,13 +340,9 @@ export default function DiffTool() {
     }
 
     batch(() => {
-      setLeftContent(savedSession.leftContent);
-      setRightContent(savedSession.rightContent);
       setLeftLang(savedSession.leftLang);
       setRightLang(savedSession.rightLang);
       setChangesOnly(savedSession.changesOnly);
-      setLeftFile(savedSession.leftFile);
-      setRightFile(savedSession.rightFile);
     });
   });
 
@@ -400,20 +417,15 @@ export default function DiffTool() {
 
   createEffect(() => {
     const sessionState = {
-      leftContent: leftContent(),
-      rightContent: rightContent(),
       leftLang: leftLang(),
       rightLang: rightLang(),
       changesOnly: changesOnly(),
-      leftFile: leftFile(),
-      rightFile: rightFile(),
     };
 
     if (
-      sessionState.leftContent === "" &&
-      sessionState.rightContent === "" &&
-      sessionState.leftFile === null &&
-      sessionState.rightFile === null
+      sessionState.leftLang === DEFAULT_DIFF_SESSION_STATE.leftLang &&
+      sessionState.rightLang === DEFAULT_DIFF_SESSION_STATE.rightLang &&
+      sessionState.changesOnly === DEFAULT_DIFF_SESSION_STATE.changesOnly
     ) {
       clearSessionState(DIFF_SESSION_STORAGE_KEY);
       return;

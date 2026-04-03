@@ -6,13 +6,9 @@ describe("diff session schema", () => {
   it("accepts valid diff session state", () => {
     expect(
       isDiffSessionState({
-        leftContent: "a",
-        rightContent: "b",
         leftLang: "toml",
         rightLang: "yaml",
         changesOnly: true,
-        leftFile: { name: "left.json", size: 10, type: "application/json" },
-        rightFile: null,
       })
     ).toBe(true);
   });
@@ -20,29 +16,27 @@ describe("diff session schema", () => {
   it("rejects invalid diff session state", () => {
     expect(
       isDiffSessionState({
-        leftContent: "a",
-        rightContent: "b",
         leftLang: "toml",
         rightLang: "yaml",
         changesOnly: "yes",
-        leftFile: null,
-        rightFile: null,
       })
     ).toBe(false);
   });
 
-  it("caps persistence for overly large diff inputs", () => {
+  it("persists only when the diff preferences differ from the baseline", () => {
     expect(
       shouldPersistDiffSession({
-        leftContent: "a".repeat(50_000),
-        rightContent: "b".repeat(50_000),
-      })
-    ).toBe(true);
-    expect(
-      shouldPersistDiffSession({
-        leftContent: "a".repeat(50_001),
-        rightContent: "b".repeat(50_000),
+        leftLang: "text",
+        rightLang: "text",
+        changesOnly: true,
       })
     ).toBe(false);
+    expect(
+      shouldPersistDiffSession({
+        leftLang: "json",
+        rightLang: "text",
+        changesOnly: true,
+      })
+    ).toBe(true);
   });
 });

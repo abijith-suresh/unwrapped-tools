@@ -1,0 +1,89 @@
+---
+import Base from "@/layouts/Base.astro";
+import { LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
+---
+
+<Base
+  title="Local Persistence Contract"
+  description="How unwrapped.tools stores local preferences and what it does not persist by default."
+>
+  <main class="privacy-shell">
+    <article class="privacy-card">
+      <h1>Local Persistence Contract</h1>
+      <p>
+        <code>unwrapped.tools</code> is local-only and privacy-first. Preferences may persist in this
+        browser when they improve continuity, but tool inputs do not persist by default.
+      </p>
+
+      <h2>Persists locally by default</h2>
+      <ul>
+        {
+          LOCAL_PERSISTENCE_ENTRIES.map((entry) => (
+            <li>
+              <strong>{entry.label}</strong>: {entry.description}
+            </li>
+          ))
+        }
+      </ul>
+
+      <h2>Does not persist by default</h2>
+      <ul>
+        <li>JWT input and decoded payloads</li>
+        <li>Hash input text and generated digests</li>
+        <li>UUID lists and copy actions</li>
+        <li>Timestamp inputs and derived values</li>
+        <li>Base64 input and output</li>
+        <li>JSON formatter input and formatted output</li>
+        <li>Regex patterns, flags, and test text</li>
+        <li>Diff input contents and imported file contents</li>
+      </ul>
+
+      <h2>Clear path</h2>
+      <p>
+        The settings modal exposes <strong>Clear local data</strong>. That clears the registered
+        local preferences and installed-session recovery values from this browser and resets the
+        shell theme to the default palette.
+      </p>
+    </article>
+  </main>
+</Base>
+
+<style>
+  .privacy-shell {
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+    padding: 2rem 1rem 3rem;
+    background: var(--bg-primary);
+  }
+
+  .privacy-card {
+    width: min(100%, 52rem);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    color: var(--text-primary);
+  }
+
+  h1,
+  h2 {
+    margin: 0 0 0.75rem;
+  }
+
+  h2 {
+    margin-top: 1.5rem;
+    font-size: 1rem;
+  }
+
+  p,
+  li {
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.25rem;
+  }
+</style>

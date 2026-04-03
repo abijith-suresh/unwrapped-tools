@@ -1,12 +1,7 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  DEFAULT_THEME,
-  getThemeBootstrapScript,
-  isThemeName,
-  resolveTheme,
-  THEME_STORAGE_KEY,
-} from "./theme";
+import { DEFAULT_THEME, getThemeBootstrapScript, isThemeName, resolveTheme } from "./theme";
+import { THEME_STORAGE_KEY } from "./localPersistence";
 
 describe("theme utilities", () => {
   it("recognizes valid theme names", () => {

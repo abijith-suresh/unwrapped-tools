@@ -1,8 +1,6 @@
 import { type Language, SUPPORTED_LANGUAGES } from "../../lib/language";
 
-export const DIFF_SESSION_STORAGE_KEY = "unwrapped-tool-session:diff";
-export const DIFF_SESSION_VERSION = 1;
-export const DIFF_SESSION_MAX_CHARS = 100_000;
+export const DIFF_SESSION_VERSION = 2;
 
 export interface DiffFileMeta {
   name: string;
@@ -11,29 +9,19 @@ export interface DiffFileMeta {
 }
 
 export interface DiffSessionState {
-  leftContent: string;
-  rightContent: string;
   leftLang: Language;
   rightLang: Language;
   changesOnly: boolean;
-  leftFile: DiffFileMeta | null;
-  rightFile: DiffFileMeta | null;
 }
+
+export const DEFAULT_DIFF_SESSION_STATE: DiffSessionState = {
+  leftLang: "text",
+  rightLang: "text",
+  changesOnly: true,
+};
 
 function isLanguage(value: unknown): value is Language {
   return typeof value === "string" && SUPPORTED_LANGUAGES.includes(value as Language);
-}
-
-function isDiffFileMeta(value: unknown): value is DiffFileMeta {
-  if (typeof value !== "object" || value === null) {
-    return false;
-  }
-
-  const meta = value as Record<string, unknown>;
-
-  return (
-    typeof meta.name === "string" && typeof meta.size === "number" && typeof meta.type === "string"
-  );
 }
 
 export function isDiffSessionState(value: unknown): value is DiffSessionState {
@@ -44,18 +32,16 @@ export function isDiffSessionState(value: unknown): value is DiffSessionState {
   const state = value as Record<string, unknown>;
 
   return (
-    typeof state.leftContent === "string" &&
-    typeof state.rightContent === "string" &&
     isLanguage(state.leftLang) &&
     isLanguage(state.rightLang) &&
-    typeof state.changesOnly === "boolean" &&
-    (state.leftFile === null || isDiffFileMeta(state.leftFile)) &&
-    (state.rightFile === null || isDiffFileMeta(state.rightFile))
+    typeof state.changesOnly === "boolean"
   );
 }
 
-export function shouldPersistDiffSession(
-  state: Pick<DiffSessionState, "leftContent" | "rightContent">
-): boolean {
-  return state.leftContent.length + state.rightContent.length <= DIFF_SESSION_MAX_CHARS;
+export function shouldPersistDiffSession(state: DiffSessionState): boolean {
+  return (
+    state.leftLang !== DEFAULT_DIFF_SESSION_STATE.leftLang ||
+    state.rightLang !== DEFAULT_DIFF_SESSION_STATE.rightLang ||
+    state.changesOnly !== DEFAULT_DIFF_SESSION_STATE.changesOnly
+  );
 }

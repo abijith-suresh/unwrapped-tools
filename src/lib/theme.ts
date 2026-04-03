@@ -1,6 +1,7 @@
+import { THEME_STORAGE_KEY } from "./localPersistence";
+
 export type ThemeName = "dracula" | "catppuccin" | "nord" | "gruvbox";
 
-export const THEME_STORAGE_KEY = "unwrapped-theme";
 export const DEFAULT_THEME: ThemeName = "catppuccin";
 
 export const THEMES: { name: ThemeName; label: string }[] = [
@@ -38,8 +39,12 @@ export function getTheme(): ThemeName {
   return resolveTheme(localStorage.getItem(THEME_STORAGE_KEY));
 }
 
-export function setTheme(theme: ThemeName): void {
+export function applyTheme(theme: ThemeName): void {
   document.documentElement.setAttribute("data-theme", theme);
+}
+
+export function setTheme(theme: ThemeName): void {
+  applyTheme(theme);
   localStorage.setItem(THEME_STORAGE_KEY, theme);
 }
 

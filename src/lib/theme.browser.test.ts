@@ -2,7 +2,8 @@
 
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
-import { DEFAULT_THEME, getTheme, initTheme, setTheme, THEME_STORAGE_KEY } from "./theme";
+import { THEME_STORAGE_KEY } from "./localPersistence";
+import { DEFAULT_THEME, getTheme, initTheme, setTheme } from "./theme";
 
 describe("theme browser runtime", () => {
   beforeEach(() => {

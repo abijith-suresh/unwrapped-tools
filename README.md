@@ -1,72 +1,49 @@
-# twish
+# unwrapped.tools
 
-A desktop-first, local-first PWA for comparing configs, code, and plain text without uploading anything.
+`unwrapped.tools` is a desktop-first, local-first PWA for developer utilities that run entirely in the browser.
 
-Built because comparing environment-specific config files at work kept turning into a noisy, awkward workflow. `twish` keeps the diff local, fast, and installable.
+No server. No uploads. No tracking.
 
-Live at: **[twish.vercel.app](https://twish.vercel.app)**
+## Current tools
 
-## What it does
+- JWT Decoder
+- Text Diff
+- Base64
+- JSON Formatter
+- Hash Generator
+- UUID Generator
+- Timestamp Converter
+- Regex Tester
 
-- **Live side-by-side diff** — compare two inputs instantly as you type, paste, drop, or open files
-- **Config-friendly workflow** — works especially well for JSON, YAML, `.env`, and other text-based config files
-- **Changes-only view** — focus on meaningful lines without losing nearby context
-- **Rich editor surface** — CodeMirror 6 with syntax highlighting for common developer file types
-- **Offline-first PWA** — install it and keep using `/app` after the first successful load
-- **Private by design** — no file uploads, no server-side diffing, no analytics; processing stays in your browser
+## Product principles
+
+- Local-only processing: tool input stays on the device
+- Installable PWA: works offline after the first successful load
+- Shared shell: every tool route runs inside the same editor-style interface
+- Conservative persistence: preferences may persist locally, but tool inputs do not persist by default
+
+See `/privacy` in the app for the current local persistence contract.
 
 ## Stack
 
-- [Astro 5](https://astro.build) — static site framework
-- [SolidJS](https://www.solidjs.com) — interactive diff interface
-- [Tailwind CSS v4](https://tailwindcss.com) — styling and design system primitives
-- [CodeMirror 6](https://codemirror.net) — editor surface
-- [diff](https://github.com/kpdecker/jsdiff) — line diff engine
-- [Bun](https://bun.sh) — package manager and runtime
-- [Vercel](https://vercel.com) — production hosting
+- Astro 5
+- SolidJS
+- Tailwind CSS v4
+- TypeScript strict mode
+- Bun
+- Vercel
 
 ## Development
 
 ```sh
-bun install        # install dependencies
-bun dev            # start dev server at localhost:4321
-bun build          # build for production
-bun preview        # preview production build
-bun run lint       # run ESLint
-bun run format     # run Prettier
-bun run test       # run tests
-bun run type-check # TypeScript check
+bun install
+bun dev
+bun build
+bun preview
+bun run type-check
+bun run lint
+bun run format
+bun run test
 ```
 
-See [AGENTS.md](./AGENTS.md) for full commands, project conventions, and AI agent instructions.
-
-## Project Structure
-
-```
-src/
-├── components/
-│   ├── layout/        # Header, Footer
-│   ├── landing/       # Hero, FeatureCard
-│   └── app/           # Solid app components
-├── layouts/
-│   ├── BaseLayout.astro
-│   ├── MarketingLayout.astro
-│   └── AppLayout.astro
-├── pages/
-│   ├── index.astro    # Landing page
-│   ├── features.astro
-│   ├── about.astro
-│   ├── docs.astro
-│   ├── changelog.astro
-│   └── app.astro      # The diff tool
-└── styles/
-    └── global.css
-```
-
-## Contributing
-
-All contributions welcome — open an issue or PR. See [AGENTS.md](./AGENTS.md) for code conventions and branch/commit rules.
-
-## License
-
-[MIT](./LICENSE)
+See `AGENTS.md` for project conventions, architecture notes, and contributor instructions.
