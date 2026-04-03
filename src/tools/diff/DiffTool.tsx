@@ -9,17 +9,12 @@ import {
   Show,
 } from "solid-js";
 
-import {
-  createDiffRows,
-  filterRowsWithContext,
-  getChangeSourceIndices,
-  getDiffStats,
-} from "@/lib/diff";
+import { type DiffAnalysisResult } from "@/lib/diffAnalysis";
+import { createDiffAnalysisExecutor } from "@/lib/diffExecution";
 import { DEFAULT_IMPORT_MAX_BYTES, formatBytes, readImportedFile } from "@/lib/fileImport";
 import { type Language, SUPPORTED_LANGUAGES } from "@/lib/language";
 import { detectLanguage } from "@/lib/languageDetection";
 import { clearSessionState, loadSessionState, saveSessionState } from "@/lib/session";
-import { prepareStructuredCompare } from "@/lib/structuredCompare";
 import {
   DIFF_SESSION_STORAGE_KEY,
   DIFF_SESSION_VERSION,
@@ -34,6 +29,7 @@ import {
 
 const DEBOUNCE_MS = 400;
 const DIFF_CONTEXT = 3;
+const EMPTY_STATS = { added: 0, removed: 0 };
 
 const LANGUAGE_LABELS: Record<Language, string> = {
   text: "Text",
@@ -283,6 +279,8 @@ function InputPanel(props: InputPanelProps) {
 // ---------------------------------------------------------------------------
 
 export default function DiffTool() {
+  const diffExecutor = createDiffAnalysisExecutor();
+
   // --- State signals --------------------------------------------------------
   const [leftContent, setLeftContent] = createSignal("");
   const [rightContent, setRightContent] = createSignal("");
@@ -295,6 +293,7 @@ export default function DiffTool() {
   const [fileNotice, setFileNotice] = createSignal<string | null>(null);
   const [leftFile, setLeftFile] = createSignal<DiffFileMeta | null>(null);
   const [rightFile, setRightFile] = createSignal<DiffFileMeta | null>(null);
+  const [analysis, setAnalysis] = createSignal<DiffAnalysisResult | null>(null);
 
   // diffData holds the committed snapshot used for computing the diff
   const [diffData, setDiffData] = createSignal<{
@@ -303,6 +302,7 @@ export default function DiffTool() {
     leftLang: Language;
     rightLang: Language;
   } | null>(null);
+  let latestAnalysisRun = 0;
 
   // --- Debounced diff trigger -----------------------------------------------
   let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -340,6 +340,7 @@ export default function DiffTool() {
 
     if (left === "" && right === "") {
       setPending(false);
+      setAnalysis(null);
       setDiffData(null);
       return;
     }
@@ -348,10 +349,53 @@ export default function DiffTool() {
     debounceTimer = setTimeout(() => {
       batch(() => {
         setDiffData({ original: left, modified: right, leftLang: ll, rightLang: rl });
-        setPending(false);
         setCurrentChangeIdx(0);
       });
     }, DEBOUNCE_MS);
+  });
+
+  createEffect(() => {
+    const data = diffData();
+    const changesOnlyEnabled = changesOnly();
+    const runId = ++latestAnalysisRun;
+
+    if (!data) {
+      setAnalysis(null);
+      setPending(false);
+      return;
+    }
+
+    setPending(true);
+
+    void diffExecutor
+      .execute({
+        original: data.original,
+        modified: data.modified,
+        leftLanguage: data.leftLang,
+        rightLanguage: data.rightLang,
+        changesOnly: changesOnlyEnabled,
+        context: DIFF_CONTEXT,
+      })
+      .then((response) => {
+        if (runId !== latestAnalysisRun) {
+          return;
+        }
+
+        batch(() => {
+          setAnalysis(response.result);
+          setPending(false);
+        });
+      })
+      .catch(() => {
+        if (runId !== latestAnalysisRun) {
+          return;
+        }
+
+        batch(() => {
+          setAnalysis(null);
+          setPending(false);
+        });
+      });
   });
 
   createEffect(() => {
@@ -389,41 +433,23 @@ export default function DiffTool() {
 
   onCleanup(() => {
     if (debounceTimer !== null) clearTimeout(debounceTimer);
+    diffExecutor.dispose();
   });
 
   // --- Memos ----------------------------------------------------------------
-  const preparedCompare = createMemo(() => {
-    const data = diffData();
-    if (!data) return null;
-    return prepareStructuredCompare({
-      original: data.original,
-      modified: data.modified,
-      leftLanguage: data.leftLang,
-      rightLanguage: data.rightLang,
-    });
-  });
+  const filteredRows = createMemo(() => analysis()?.filteredRows ?? []);
 
-  const rows = createMemo(() => {
-    const compare = preparedCompare();
-    if (!compare) return [];
-    return createDiffRows(compare.original, compare.modified);
-  });
+  const stats = createMemo(() => analysis()?.stats ?? EMPTY_STATS);
 
-  const filteredRows = createMemo(() => filterRowsWithContext(rows(), changesOnly(), DIFF_CONTEXT));
+  const changeIndices = createMemo(() => analysis()?.changeIndices ?? []);
 
-  const stats = createMemo(() => getDiffStats(rows()));
+  const strategy = createMemo(() => analysis()?.strategy ?? "text");
 
-  const changeIndices = createMemo(() => getChangeSourceIndices(rows()));
-
-  const strategy = createMemo(() => preparedCompare()?.strategy ?? "text");
-
-  const structuredErrors = createMemo(() => preparedCompare()?.errors ?? []);
+  const structuredErrors = createMemo(() => analysis()?.errors ?? []);
 
   const isEmpty = createMemo(() => leftContent() === "" && rightContent() === "");
 
-  const isIdentical = createMemo(
-    () => diffData() !== null && !pending() && stats().added === 0 && stats().removed === 0
-  );
+  const isIdentical = createMemo(() => analysis()?.isIdentical ?? false);
 
   // --- File handling --------------------------------------------------------
   async function handleFileLoad(side: "left" | "right", file: File) {
