@@ -1,6 +1,5 @@
+import { LAST_TOOL_ROUTE_STORAGE_KEY } from "./localPersistence";
 import { getToolRoute, tools } from "../tools/registry";
-
-export const LAST_TOOL_ROUTE_STORAGE_KEY = "unwrapped-last-tool-route";
 
 const TOOL_ROUTES = tools.map((tool) => getToolRoute(tool.slug));
 

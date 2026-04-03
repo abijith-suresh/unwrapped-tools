@@ -1,94 +1,17 @@
 import { createMemo, createSignal, For, Show } from "solid-js";
 
 import CopyButton from "@/components/CopyButton";
-
-// ---------------------------------------------------------------------------
-// Types & constants
-// ---------------------------------------------------------------------------
-
-interface TimeZoneOption {
-  label: string;
-  tz: string;
-}
-
-const DEFAULT_ZONES: TimeZoneOption[] = [
-  { label: "UTC", tz: "UTC" },
-  { label: "US/Eastern", tz: "America/New_York" },
-  { label: "US/Pacific", tz: "America/Los_Angeles" },
-];
-
-// Well-known IANA zones a user can choose from
-const PRESET_ZONES: TimeZoneOption[] = [
-  { label: "UTC", tz: "UTC" },
-  { label: "US/Eastern", tz: "America/New_York" },
-  { label: "US/Central", tz: "America/Chicago" },
-  { label: "US/Mountain", tz: "America/Denver" },
-  { label: "US/Pacific", tz: "America/Los_Angeles" },
-  { label: "London", tz: "Europe/London" },
-  { label: "Paris", tz: "Europe/Paris" },
-  { label: "Berlin", tz: "Europe/Berlin" },
-  { label: "Moscow", tz: "Europe/Moscow" },
-  { label: "Dubai", tz: "Asia/Dubai" },
-  { label: "India", tz: "Asia/Kolkata" },
-  { label: "Bangkok", tz: "Asia/Bangkok" },
-  { label: "Singapore", tz: "Asia/Singapore" },
-  { label: "Tokyo", tz: "Asia/Tokyo" },
-  { label: "Sydney", tz: "Australia/Sydney" },
-  { label: "Auckland", tz: "Pacific/Auckland" },
-];
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-/** Try to interpret the input as an epoch (seconds or milliseconds). */
-function parseEpoch(raw: string): { ms: number; unit: "s" | "ms" } | null {
-  const trimmed = raw.trim();
-  if (!trimmed) return null;
-  const n = Number(trimmed);
-  if (!Number.isFinite(n)) return null;
-
-  // Heuristic: if > 1e12 treat as milliseconds, otherwise seconds
-  if (Math.abs(n) > 1e12) {
-    return { ms: n, unit: "ms" };
-  }
-  return { ms: n * 1000, unit: "s" };
-}
-
-/** Format a Date in a given IANA timezone. */
-function formatInZone(date: Date, tz: string): string {
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: tz,
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-      hour12: false,
-    })
-      .format(date)
-      .replace(",", "");
-  } catch {
-    return "Invalid timezone";
-  }
-}
-
-/** Convert a datetime-local input value to epoch ms. */
-function localInputToMs(value: string): number | null {
-  if (!value) return null;
-  const d = new Date(value);
-  return Number.isNaN(d.getTime()) ? null : d.getTime();
-}
-
-/** Format ms epoch to datetime-local input value (local time). */
-function msToLocalInput(ms: number): string {
-  const d = new Date(ms);
-  // datetime-local needs YYYY-MM-DDTHH:mm
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
+import ToolActionButton from "@/components/ToolActionButton";
+import ToolStatusMessage from "@/components/ToolStatusMessage";
+import {
+  DEFAULT_ZONES,
+  formatInZone,
+  localInputToMs,
+  msToLocalInput,
+  parseEpoch,
+  PRESET_ZONES,
+  type TimeZoneOption,
+} from "@/lib/timestamp";
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -119,6 +42,12 @@ export default function TimestampTool() {
     const now = Date.now();
     setEpochInput(String(Math.floor(now / 1000)));
     setDatetimeInput(msToLocalInput(now));
+  }
+
+  function reset() {
+    setEpochInput("");
+    setDatetimeInput("");
+    setZones(DEFAULT_ZONES);
   }
 
   function handleEpochInput(value: string) {
@@ -204,23 +133,14 @@ export default function TimestampTool() {
           </Show>
         </div>
 
-        {/* Now button */}
-        <button
-          onClick={useNow}
-          style={{
-            padding: "0.5rem 0.875rem",
-            "border-radius": "0.375rem",
-            border: "1px solid var(--border)",
-            background: "var(--bg-secondary)",
-            color: "var(--accent-primary)",
-            "font-size": "0.8125rem",
-            "font-weight": "600",
-            cursor: "pointer",
-            "white-space": "nowrap",
-          }}
-        >
-          Use now
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem", "align-items": "center" }}>
+          <ToolActionButton onClick={useNow} variant="primary">
+            Use now
+          </ToolActionButton>
+          <ToolActionButton onClick={reset} variant="ghost">
+            Reset
+          </ToolActionButton>
+        </div>
 
         {/* Datetime-local input */}
         <div style={{ display: "flex", "flex-direction": "column", gap: "0.375rem" }}>
@@ -440,15 +360,9 @@ export default function TimestampTool() {
 
       {/* Empty hint */}
       <Show when={!epochInput().trim() && !datetimeInput()}>
-        <p
-          style={{
-            "font-size": "0.8125rem",
-            color: "var(--text-muted)",
-            margin: "0",
-          }}
-        >
+        <ToolStatusMessage tone="muted">
           Enter a Unix timestamp (seconds or ms auto-detected) or pick a date above
-        </p>
+        </ToolStatusMessage>
       </Show>
     </div>
   );

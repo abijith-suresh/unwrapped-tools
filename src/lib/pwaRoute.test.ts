@@ -4,9 +4,9 @@ import {
   getPwaRouteBootstrapScript,
   getRestorableToolRoute,
   getStandaloneRouteRecovery,
-  LAST_TOOL_ROUTE_STORAGE_KEY,
   shouldPersistToolRoute,
 } from "./pwaRoute";
+import { LAST_TOOL_ROUTE_STORAGE_KEY } from "./localPersistence";
 
 describe("pwaRoute", () => {
   it("accepts only registered tool routes for restore", () => {

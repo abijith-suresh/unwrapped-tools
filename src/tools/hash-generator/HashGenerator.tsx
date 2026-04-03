@@ -1,32 +1,9 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, onCleanup, Show } from "solid-js";
 
 import CopyButton from "@/components/CopyButton";
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-type Algorithm = "SHA-1" | "SHA-256" | "SHA-384" | "SHA-512";
-
-const ALGORITHMS: Algorithm[] = ["SHA-1", "SHA-256", "SHA-384", "SHA-512"];
-
-interface HashResult {
-  algorithm: Algorithm;
-  hex: string;
-}
-
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-async function hashText(text: string, algorithm: Algorithm): Promise<string> {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text);
-  const buffer = await crypto.subtle.digest(algorithm, data);
-  return Array.from(new Uint8Array(buffer))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-}
+import ToolActionButton from "@/components/ToolActionButton";
+import ToolStatusMessage from "@/components/ToolStatusMessage";
+import { type HashResult, hashTextWithAlgorithms } from "@/lib/hash";
 
 // ---------------------------------------------------------------------------
 // Main component
@@ -42,16 +19,14 @@ export default function HashGenerator() {
   async function compute(text: string) {
     if (!text.trim()) {
       setResults([]);
+      setComputing(false);
       return;
     }
+
     setComputing(true);
+
     try {
-      const computed = await Promise.all(
-        ALGORITHMS.map(async (alg) => ({
-          algorithm: alg,
-          hex: await hashText(text, alg),
-        }))
-      );
+      const computed = await hashTextWithAlgorithms(text);
       setResults(computed);
     } finally {
       setComputing(false);
@@ -63,6 +38,17 @@ export default function HashGenerator() {
     clearTimeout(debounceTimer);
     debounceTimer = setTimeout(() => void compute(value), 300);
   }
+
+  function handleClear() {
+    clearTimeout(debounceTimer);
+    setInput("");
+    setResults([]);
+    setComputing(false);
+  }
+
+  onCleanup(() => {
+    clearTimeout(debounceTimer);
+  });
 
   return (
     <div
@@ -76,9 +62,32 @@ export default function HashGenerator() {
         width: "100%",
       }}
     >
-      {/* ------------------------------------------------------------------ */}
-      {/* Input                                                               */}
-      {/* ------------------------------------------------------------------ */}
+      <div
+        style={{
+          display: "flex",
+          "flex-wrap": "wrap",
+          "align-items": "center",
+          gap: "0.75rem",
+        }}
+      >
+        <ToolActionButton
+          onClick={() => void compute(input())}
+          variant="primary"
+          disabled={!input().trim()}
+        >
+          Hash input
+        </ToolActionButton>
+        <ToolActionButton
+          onClick={handleClear}
+          disabled={!input().trim() && results().length === 0}
+        >
+          Clear
+        </ToolActionButton>
+        <span style={{ "font-size": "0.8125rem", color: "var(--text-muted)" }}>
+          Local-only hashing via the browser&apos;s Web Crypto API
+        </span>
+      </div>
+
       <div style={{ display: "flex", "flex-direction": "column", gap: "0.375rem" }}>
         <label
           style={{
@@ -118,15 +127,7 @@ export default function HashGenerator() {
       {/* Computing indicator                                                 */}
       {/* ------------------------------------------------------------------ */}
       <Show when={computing()}>
-        <p
-          style={{
-            "font-size": "0.8125rem",
-            color: "var(--text-muted)",
-            margin: "0",
-          }}
-        >
-          Computing…
-        </p>
+        <ToolStatusMessage tone="muted">Computing…</ToolStatusMessage>
       </Show>
 
       {/* ------------------------------------------------------------------ */}
@@ -198,15 +199,9 @@ export default function HashGenerator() {
 
       {/* Empty hint */}
       <Show when={!input().trim() && results().length === 0}>
-        <p
-          style={{
-            "font-size": "0.8125rem",
-            color: "var(--text-muted)",
-            margin: "0",
-          }}
-        >
+        <ToolStatusMessage tone="muted">
           SHA-1 · SHA-256 · SHA-384 · SHA-512 computed via the browser's Web Crypto API
-        </p>
+        </ToolStatusMessage>
       </Show>
     </div>
   );

@@ -1,6 +1,9 @@
 import { createSignal, For, Show } from "solid-js";
 
 import CopyButton from "@/components/CopyButton";
+import ToolActionButton from "@/components/ToolActionButton";
+import ToolStatusMessage from "@/components/ToolStatusMessage";
+import { copyToClipboard } from "@/lib/clipboard";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -18,6 +21,7 @@ export default function UuidGenerator() {
   const [uuids, setUuids] = createSignal<string[]>([generateUuid()]);
   const [count, setCount] = createSignal(1);
   const [uppercase, setUppercase] = createSignal(false);
+  const [copyStatus, setCopyStatus] = createSignal<"idle" | "success" | "error">("idle");
 
   function display(uuid: string): string {
     return uppercase() ? uuid.toUpperCase() : uuid;
@@ -28,21 +32,18 @@ export default function UuidGenerator() {
     setUuids(Array.from({ length: n }, generateUuid));
   }
 
-  function copyAll() {
+  async function copyAll() {
     const text = uuids().map(display).join("\n");
-    void navigator.clipboard.writeText(text);
+    const ok = await copyToClipboard(text);
+    setCopyStatus(ok ? "success" : "error");
   }
 
-  const buttonStyle = {
-    padding: "0.375rem 0.875rem",
-    "border-radius": "0.375rem",
-    border: "1px solid var(--border)",
-    background: "var(--bg-secondary)",
-    color: "var(--text-secondary)",
-    "font-size": "0.8125rem",
-    "font-weight": "600",
-    cursor: "pointer",
-  };
+  function reset() {
+    setCount(1);
+    setUppercase(false);
+    setCopyStatus("idle");
+    setUuids([generateUuid()]);
+  }
 
   return (
     <div
@@ -103,41 +104,32 @@ export default function UuidGenerator() {
           />
         </div>
 
-        {/* Generate button */}
-        <button
-          onClick={generate}
-          style={{
-            ...buttonStyle,
-            background: "var(--accent-primary)",
-            color: "var(--bg-primary)",
-            border: "none",
-          }}
-        >
+        <ToolActionButton onClick={generate} variant="primary">
           Generate
-        </button>
+        </ToolActionButton>
 
         {/* Uppercase toggle */}
-        <button
-          onClick={() => setUppercase((v) => !v)}
-          style={{
-            ...buttonStyle,
-            border: `1px solid ${uppercase() ? "var(--accent-primary)" : "var(--border)"}`,
-            color: uppercase() ? "var(--accent-primary)" : "var(--text-secondary)",
-            background: uppercase()
-              ? "color-mix(in srgb, var(--accent-primary) 12%, transparent)"
-              : "var(--bg-secondary)",
-          }}
-        >
+        <ToolActionButton active={uppercase()} onClick={() => setUppercase((v) => !v)}>
           UPPER
-        </button>
+        </ToolActionButton>
 
         {/* Copy all */}
         <Show when={uuids().length > 1}>
-          <button onClick={copyAll} style={buttonStyle}>
-            Copy all
-          </button>
+          <ToolActionButton onClick={() => void copyAll()}>Copy all</ToolActionButton>
         </Show>
+
+        <ToolActionButton onClick={reset} variant="ghost">
+          Reset
+        </ToolActionButton>
       </div>
+
+      <Show when={copyStatus() === "success"}>
+        <ToolStatusMessage tone="success">Copied all generated UUIDs.</ToolStatusMessage>
+      </Show>
+
+      <Show when={copyStatus() === "error"}>
+        <ToolStatusMessage tone="error">Could not copy the generated UUIDs.</ToolStatusMessage>
+      </Show>
 
       {/* ------------------------------------------------------------------ */}
       {/* UUID list                                                           */}
@@ -181,15 +173,9 @@ export default function UuidGenerator() {
         </For>
       </div>
 
-      <p
-        style={{
-          "font-size": "0.8125rem",
-          color: "var(--text-muted)",
-          margin: "0",
-        }}
-      >
+      <ToolStatusMessage tone="muted">
         UUID v4 generated via <code>crypto.randomUUID()</code> · max 100 at once
-      </p>
+      </ToolStatusMessage>
     </div>
   );
 }

@@ -1,7 +1,8 @@
 import { Settings, X } from "lucide-solid";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 
-import { getTheme, setTheme, type ThemeName, THEMES } from "@/lib/theme";
+import { clearLocalPersistence, LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
+import { applyTheme, DEFAULT_THEME, getTheme, setTheme, type ThemeName, THEMES } from "@/lib/theme";
 
 // Hardcoded accent hex values for theme dot previews (explicitly allowed)
 const THEME_ACCENTS: Record<ThemeName, string> = {
@@ -14,15 +15,24 @@ const THEME_ACCENTS: Record<ThemeName, string> = {
 export default function SettingsModal() {
   const [open, setOpen] = createSignal(false);
   const [activeTheme, setActiveTheme] = createSignal<ThemeName>(getTheme());
+  const [clearedLocalData, setClearedLocalData] = createSignal(false);
   const [hoveredTheme, setHoveredTheme] = createSignal<ThemeName | null>(null);
 
   function openModal() {
     setActiveTheme(getTheme());
+    setClearedLocalData(false);
     setOpen(true);
   }
 
   function closeModal() {
     setOpen(false);
+  }
+
+  function handleClearLocalData() {
+    clearLocalPersistence();
+    applyTheme(DEFAULT_THEME);
+    setActiveTheme(DEFAULT_THEME);
+    setClearedLocalData(true);
   }
 
   function handleKeyDown(e: KeyboardEvent) {
@@ -165,6 +175,58 @@ export default function SettingsModal() {
                   }}
                 </For>
               </ul>
+            </div>
+
+            <div>
+              <div class="px-3 py-1.5" style={{ "background-color": "var(--bg-tertiary)" }}>
+                <span
+                  class="text-[10px] font-semibold uppercase tracking-widest"
+                  style={{ color: "var(--text-muted)" }}
+                >
+                  LOCAL DATA
+                </span>
+              </div>
+
+              <div
+                class="flex flex-col gap-3 px-4 py-3 text-sm"
+                style={{ color: "var(--text-secondary)" }}
+              >
+                <p class="m-0">
+                  Preferences and installed-session recovery stay in this browser only. Tool inputs
+                  do not persist by default.
+                </p>
+                <ul class="m-0 flex list-disc flex-col gap-1 pl-5">
+                  <For each={LOCAL_PERSISTENCE_ENTRIES}>
+                    {(entry) => (
+                      <li>
+                        <strong style={{ color: "var(--text-primary)" }}>{entry.label}</strong>:{" "}
+                        {entry.description}
+                      </li>
+                    )}
+                  </For>
+                </ul>
+                <div class="flex flex-wrap items-center gap-3">
+                  <button
+                    onClick={handleClearLocalData}
+                    class="rounded border px-3 py-1.5 text-sm font-semibold"
+                    style={{
+                      border: "1px solid var(--border)",
+                      background: "var(--bg-secondary)",
+                      color: "var(--text-secondary)",
+                    }}
+                  >
+                    Clear local data
+                  </button>
+                  <a href="/privacy" class="text-sm" style={{ color: "var(--accent-primary)" }}>
+                    Read persistence contract
+                  </a>
+                </div>
+                <Show when={clearedLocalData()}>
+                  <p class="m-0 text-sm" style={{ color: "var(--accent-success)" }}>
+                    Cleared local preferences and reset the shell theme to the default palette.
+                  </p>
+                </Show>
+              </div>
             </div>
           </div>
         </div>
