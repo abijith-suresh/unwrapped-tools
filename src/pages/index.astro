@@ -13,6 +13,13 @@ const catColor: Record<ToolCategory, string> = {
   network: "var(--accent-primary)",
 };
 
+const sitePages = [
+  { slug: "about", label: "about", description: "local-only philosophy, stack, and links" },
+  { slug: "features", label: "features", description: "tools, themes, shortcuts, and PWA" },
+  { slug: "privacy", label: "privacy", description: "local persistence contract" },
+  { slug: "changelog", label: "changelog", description: "release history" },
+];
+
 // Build camelCase JS identifier from slug
 function toCamelCase(slug: string): string {
   return slug
@@ -31,9 +38,9 @@ function toCamelCase(slug: string): string {
 <!-- line 3 --><span class="tok-comment">// Fast, local-first developer tools.</span>
 <!-- line 4 --><span class="tok-comment">// No server. No uploads. No tracking.</span>
 <!-- line 5 -->&nbsp;
-<!-- line 6 --><span class="tok-kw">const</span> <span class="tok-id">tools</span> <span class="tok-punct">=</span> <span class="tok-punct">{"{"}</span>
-{tools.map((tool) => (
-<a href={getToolRoute(tool.slug)} class="code-line-link">  <span class="tok-id">{toCamelCase(tool.slug)}</span><span class="tok-punct">:</span> <span class="tok-punct">{"{"}</span> <span class="tok-cat" style={`color: ${catColor[tool.category]}`}>[{tool.category}]</span> <span class="tok-str">"{tool.name}"</span> <span class="tok-punct">{"}"}</span><span class="tok-punct">,</span>
+<!-- line 6 --><span class="tok-kw">const</span> <span class="tok-id">pages</span> <span class="tok-punct">=</span> <span class="tok-punct">{"{"}</span>
+{sitePages.map((page) => (
+<a href={`/${page.slug}`} class="code-line-link">  <span class="tok-id">{toCamelCase(page.slug)}</span><span class="tok-punct">:</span> <span class="tok-punct">{"{"}</span> <span class="tok-str">"{page.description}"</span> <span class="tok-punct">{"}"}</span><span class="tok-punct">,</span>
 </a>
 ))}<span class="tok-punct">{"}"}</span><span class="tok-punct">;</span>
 &nbsp;

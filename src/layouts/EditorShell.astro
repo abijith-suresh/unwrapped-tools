@@ -30,6 +30,13 @@ const canonicalURL = new URL(
 );
 const fullTitle = title === "unwrapped.tools" ? title : `${title} — unwrapped.tools`;
 
+const SIDEBAR_PAGES = [
+  { slug: "about", label: "about.ts" },
+  { slug: "features", label: "features.ts" },
+  { slug: "privacy", label: "privacy.ts" },
+  { slug: "changelog", label: "changelog.ts" },
+];
+
 // Group tools by category, preserving registry order
 const categoryOrder: ToolCategory[] = [
   "security",
@@ -97,6 +104,9 @@ const grouped: GroupedTool[] = categoryOrder
     <div class="editor-root" transition:name="editor-root" transition:animate="none">
       <!-- ── TAB BAR ── -->
       <header class="tab-bar" transition:name="tab-bar" transition:animate="none">
+        <!-- Brand (leftmost on all screen sizes) -->
+        <a href="/" class="tab-brand" aria-label="Go to homepage">unwrapped</a>
+
         <!-- Hamburger (mobile only) -->
         <button
           id="sidebar-toggle"
@@ -118,7 +128,7 @@ const grouped: GroupedTool[] = categoryOrder
           </svg>
         </button>
 
-        <!-- Active file tab -->
+        <!-- Active file tab (centered via absolute positioning) -->
         <div class="tab-filename">
           <span class="tab-dot"></span>
           <span class="tab-name">
@@ -129,7 +139,6 @@ const grouped: GroupedTool[] = categoryOrder
         <!-- Right side controls -->
         <div class="tab-controls">
           <CommandPalette client:load />
-          <a href="/" class="tab-brand" aria-label="Go to homepage"> unwrapped </a>
         </div>
       </header>
 
@@ -144,6 +153,32 @@ const grouped: GroupedTool[] = categoryOrder
           transition:animate="none"
         >
           <div class="sidebar-section-label">EXPLORER</div>
+
+          {/* Pages section */}
+          <div class="sidebar-group">
+            <div class="sidebar-category">pages</div>
+            <ul class="sidebar-list">
+              {
+                SIDEBAR_PAGES.map((page) => (
+                  <li>
+                    <a
+                      href={`/${page.slug}`}
+                      class:list={[
+                        "sidebar-item",
+                        { "sidebar-item--active": page.slug === activeSlug },
+                      ]}
+                      aria-current={page.slug === activeSlug ? "page" : undefined}
+                    >
+                      <span class="sidebar-item-icon" aria-hidden="true">
+                        {page.slug === activeSlug ? "▸" : " "}
+                      </span>
+                      <span class="sidebar-item-name">{page.label}</span>
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
 
           {
             grouped.map((group) => (
@@ -296,6 +331,7 @@ const grouped: GroupedTool[] = categoryOrder
         gap: 0.5rem;
         flex-shrink: 0;
         z-index: 20;
+        position: relative;
       }
 
       .sidebar-toggle {
@@ -322,11 +358,15 @@ const grouped: GroupedTool[] = categoryOrder
         background-color: var(--bg-primary);
         border-left: 1px solid var(--border);
         border-right: 1px solid var(--border);
+        border-bottom: 1px solid var(--bg-primary);
         padding: 0 0.875rem;
         height: 100%;
         font-size: 0.8rem;
         color: var(--text-secondary);
         flex-shrink: 0;
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
       }
 
       .tab-dot {
@@ -552,10 +592,6 @@ const grouped: GroupedTool[] = categoryOrder
 
         .sidebar-backdrop--visible {
           display: block;
-        }
-
-        .tab-brand {
-          display: none;
         }
 
         .status-ts-sep,

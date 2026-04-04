@@ -161,23 +161,23 @@ export default function CommandPalette() {
         <span>Search</span>
         <span class="flex items-center gap-0.5">
           <kbd
-            class="rounded px-1 py-0.5 text-[10px] font-mono"
+            class="rounded px-1.5 py-0.5 text-[10px] font-mono"
             style={{
               "background-color": "var(--bg-primary)",
-              "border-color": "var(--border)",
-              color: "var(--text-muted)",
               border: "1px solid var(--border)",
+              "box-shadow": "0 1px 0 var(--border)",
+              color: "var(--text-muted)",
             }}
           >
             ⌘
           </kbd>
           <kbd
-            class="rounded px-1 py-0.5 text-[10px] font-mono"
+            class="rounded px-1.5 py-0.5 text-[10px] font-mono"
             style={{
               "background-color": "var(--bg-primary)",
-              "border-color": "var(--border)",
-              color: "var(--text-muted)",
               border: "1px solid var(--border)",
+              "box-shadow": "0 1px 0 var(--border)",
+              color: "var(--text-muted)",
             }}
           >
             K
