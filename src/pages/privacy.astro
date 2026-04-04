@@ -1,89 +1,184 @@
 ---
-import Base from "@/layouts/Base.astro";
+import EditorShell from "@/layouts/EditorShell.astro";
 import { LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
 ---
 
-<Base
+<EditorShell
   title="Local Persistence Contract"
   description="How unwrapped.tools stores local preferences and what it does not persist by default."
+  activeSlug="privacy"
 >
-  <main class="privacy-shell">
-    <article class="privacy-card">
-      <h1>Local Persistence Contract</h1>
-      <p>
-        <code>unwrapped.tools</code> is local-only and privacy-first. Preferences may persist in this
-        browser when they improve continuity, but tool inputs do not persist by default.
-      </p>
+  <div class="readme-pane">
+    <pre
+      class="code-block"><code><span class="tok-comment">/**
+ * privacy.ts — Local Persistence Contract
+ *
+ * unwrapped.tools is local-only and privacy-first.
+ * Preferences may persist in this browser when they improve continuity,
+ * but tool inputs do not persist by default.
+ */</span>
 
-      <h2>Persists locally by default</h2>
-      <ul>
-        {
-          LOCAL_PERSISTENCE_ENTRIES.map((entry) => (
-            <li>
-              <strong>{entry.label}</strong>: {entry.description}
-            </li>
-          ))
-        }
-      </ul>
+<span class="tok-kw">const</span> <span class="tok-id">persists</span> <span class="tok-punct">=</span> <span class="tok-punct">{"{"}</span>
+{LOCAL_PERSISTENCE_ENTRIES.map((entry) => (
+  <span class="tok-entry">  <span class="tok-id">{entry.label}</span><span class="tok-punct">:</span> <span class="tok-str">"{entry.description}"</span><span class="tok-punct">,</span>
+</span>
+))}<span class="tok-punct">{"}"}</span><span class="tok-punct">;</span>
 
-      <h2>Does not persist by default</h2>
-      <ul>
-        <li>JWT input and decoded payloads</li>
-        <li>Hash input text and generated digests</li>
-        <li>UUID lists and copy actions</li>
-        <li>Timestamp inputs and derived values</li>
-        <li>Base64 input and output</li>
-        <li>JSON formatter input and formatted output</li>
-        <li>Regex patterns, flags, and test text</li>
-        <li>Diff input contents and imported file contents</li>
-      </ul>
+<span class="tok-kw">const</span> <span class="tok-id">neverPersists</span> <span class="tok-punct">=</span> <span class="tok-punct">[</span>
+  <span class="tok-str">"JWT input and decoded payloads"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"Hash input text and generated digests"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"UUID lists and copy actions"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"Timestamp inputs and derived values"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"Base64 input and output"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"JSON formatter input and formatted output"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"Regex patterns, flags, and test text"</span><span class="tok-punct">,</span>
+  <span class="tok-str">"Diff input contents and imported file contents"</span><span class="tok-punct">,</span>
+<span class="tok-punct">]</span><span class="tok-punct">;</span>
 
-      <h2>Clear path</h2>
-      <p>
-        The settings modal exposes <strong>Clear local data</strong>. That clears the registered
-        local preferences and installed-session recovery values from this browser and resets the
-        shell theme to the default palette.
-      </p>
-    </article>
-  </main>
-</Base>
+<span class="tok-cursor">▌</span></code></pre>
+
+    <div class="clear-section">
+      <div class="clear-header">
+        <span class="tok-comment"
+          >// Clear path — remove all registered local data from this browser</span
+        >
+      </div>
+      <div class="clear-body">
+        <button id="clear-data-btn" class="clear-btn">Clear local data</button>
+        <span id="clear-confirm" class="clear-confirm" aria-live="polite"></span>
+      </div>
+    </div>
+  </div>
+</EditorShell>
+
+<script>
+  import { clearLocalPersistence } from "@/lib/localPersistence";
+  import { applyTheme, DEFAULT_THEME } from "@/lib/theme";
+
+  function initClearButton() {
+    const btn = document.getElementById("clear-data-btn");
+    const confirm = document.getElementById("clear-confirm");
+    if (!btn || !confirm) return;
+
+    btn.addEventListener("click", () => {
+      clearLocalPersistence();
+      applyTheme(DEFAULT_THEME);
+      confirm.textContent = "Cleared. Shell theme reset to default palette.";
+    });
+  }
+
+  document.addEventListener("astro:page-load", initClearButton);
+</script>
 
 <style>
-  .privacy-shell {
-    min-height: 100dvh;
-    display: flex;
-    justify-content: center;
-    padding: 2rem 1rem 3rem;
-    background: var(--bg-primary);
+  .readme-pane {
+    padding: 1.5rem 2rem;
+    min-height: 100%;
+    font-family: var(--font-mono);
   }
 
-  .privacy-card {
-    width: min(100%, 52rem);
-    background: var(--bg-secondary);
-    border: 1px solid var(--border);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
+  /* ── CODE BLOCK ── */
+  .code-block {
+    margin: 0 0 0;
+    padding: 0;
+    background: none;
+    border: none;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    line-height: 1.75;
+    color: var(--text-primary);
+    white-space: pre;
+    overflow-x: auto;
+  }
+
+  .code-block code {
+    display: block;
+  }
+
+  /* Token colours */
+  .tok-kw {
+    color: var(--accent-primary);
+  }
+  .tok-id {
     color: var(--text-primary);
   }
-
-  h1,
-  h2 {
-    margin: 0 0 0.75rem;
+  .tok-str {
+    color: var(--accent-success);
   }
-
-  h2 {
-    margin-top: 1.5rem;
-    font-size: 1rem;
+  .tok-comment {
+    color: var(--text-muted);
+    font-style: italic;
   }
-
-  p,
-  li {
+  .tok-punct {
     color: var(--text-secondary);
-    line-height: 1.7;
   }
 
-  ul {
-    margin: 0;
-    padding-left: 1.25rem;
+  /* Blinking cursor */
+  .tok-cursor {
+    color: var(--accent-primary);
+    animation: blink 1.1s step-start infinite;
+  }
+  @keyframes blink {
+    0%,
+    100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* ── CLEAR SECTION ── */
+  .clear-section {
+    border-top: 1px solid var(--border);
+    margin-top: 1.5rem;
+    padding-top: 1.25rem;
+  }
+
+  .clear-header {
+    font-size: 0.8rem;
+    margin-bottom: 0.875rem;
+  }
+
+  .clear-body {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .clear-btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.375rem 0.875rem;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition:
+      border-color 0.1s,
+      color 0.1s;
+  }
+  .clear-btn:hover {
+    border-color: var(--accent-error);
+    color: var(--accent-error);
+  }
+
+  .clear-confirm {
+    font-size: 0.8rem;
+    color: var(--accent-success);
+    font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .readme-pane {
+      padding: 1rem;
+    }
+
+    .code-block {
+      font-size: 0.78rem;
+    }
   }
 </style>
