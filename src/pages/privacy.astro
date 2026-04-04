@@ -1,6 +1,5 @@
 ---
 import EditorShell from "@/layouts/EditorShell.astro";
-import { LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
 ---
 
 <EditorShell
@@ -13,62 +12,30 @@ import { LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
       class="code-block"><code><span class="tok-comment">/**
  * privacy.ts — Local Persistence Contract
  *
- * unwrapped.tools is local-only and privacy-first.
- * Preferences may persist in this browser when they improve continuity,
- * but tool inputs do not persist by default.
+ * unwrapped.tools runs entirely in your browser.
+ * Nothing is sent to a server. Tool inputs are never persisted.
  */</span>
 
-<span class="tok-kw">const</span> <span class="tok-id">persists</span> <span class="tok-punct">=</span> <span class="tok-punct">{"{"}</span>
-{LOCAL_PERSISTENCE_ENTRIES.map((entry) => (
-  <span class="tok-entry">  <span class="tok-id">{entry.label}</span><span class="tok-punct">:</span> <span class="tok-str">"{entry.description}"</span><span class="tok-punct">,</span>
-</span>
-))}<span class="tok-punct">{"}"}</span><span class="tok-punct">;</span>
+<span class="tok-kw">const</span> <span class="tok-id">contract</span> <span class="tok-punct">=</span> <span class="tok-punct">{"{"}</span>
 
-<span class="tok-kw">const</span> <span class="tok-id">neverPersists</span> <span class="tok-punct">=</span> <span class="tok-punct">[</span>
-  <span class="tok-str">"JWT input and decoded payloads"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"Hash input text and generated digests"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"UUID lists and copy actions"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"Timestamp inputs and derived values"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"Base64 input and output"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"JSON formatter input and formatted output"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"Regex patterns, flags, and test text"</span><span class="tok-punct">,</span>
-  <span class="tok-str">"Diff input contents and imported file contents"</span><span class="tok-punct">,</span>
-<span class="tok-punct">]</span><span class="tok-punct">;</span>
+  <span class="tok-comment">// Preferences that survive a reload — stored in localStorage</span>
+  <span class="tok-id">persists</span><span class="tok-punct">:</span> <span class="tok-punct">{"{"}</span>
+    <span class="tok-id">theme</span><span class="tok-punct">:</span>      <span class="tok-str">"selected color palette"</span><span class="tok-punct">,</span>
+    <span class="tok-id">lastRoute</span><span class="tok-punct">:</span>  <span class="tok-str">"last visited tool route — installed sessions only"</span><span class="tok-punct">,</span>
+    <span class="tok-id">diffPrefs</span><span class="tok-punct">:</span>  <span class="tok-str">"diff display preferences — language and view mode"</span><span class="tok-punct">,</span>
+  <span class="tok-punct">{"}"}</span><span class="tok-punct">,</span>
+
+  <span class="tok-comment">// All tool I/O is ephemeral — cleared when the tab closes</span>
+  <span class="tok-id">neverPersists</span><span class="tok-punct">:</span> <span class="tok-str">"tool inputs, outputs, and clipboard payloads"</span><span class="tok-punct">,</span>
+
+  <span class="tok-comment">// To erase stored preferences: open Settings → Clear local data</span>
+  <span class="tok-id">manage</span><span class="tok-punct">:</span>       <span class="tok-str">"gear icon — bottom-right of the shell"</span><span class="tok-punct">,</span>
+
+<span class="tok-punct">{"}"}</span> <span class="tok-kw">as</span> <span class="tok-kw">const</span><span class="tok-punct">;</span>
 
 <span class="tok-cursor">▌</span></code></pre>
-
-    <div class="clear-section">
-      <div class="clear-header">
-        <span class="tok-comment"
-          >// Clear path — remove all registered local data from this browser</span
-        >
-      </div>
-      <div class="clear-body">
-        <button id="clear-data-btn" class="clear-btn">Clear local data</button>
-        <span id="clear-confirm" class="clear-confirm" aria-live="polite"></span>
-      </div>
-    </div>
   </div>
 </EditorShell>
-
-<script>
-  import { clearLocalPersistence } from "@/lib/localPersistence";
-  import { applyTheme, DEFAULT_THEME } from "@/lib/theme";
-
-  function initClearButton() {
-    const btn = document.getElementById("clear-data-btn");
-    const confirm = document.getElementById("clear-confirm");
-    if (!btn || !confirm) return;
-
-    btn.addEventListener("click", () => {
-      clearLocalPersistence();
-      applyTheme(DEFAULT_THEME);
-      confirm.textContent = "Cleared. Shell theme reset to default palette.";
-    });
-  }
-
-  document.addEventListener("astro:page-load", initClearButton);
-</script>
 
 <style>
   .readme-pane {
@@ -126,50 +93,6 @@ import { LOCAL_PERSISTENCE_ENTRIES } from "@/lib/localPersistence";
     50% {
       opacity: 0;
     }
-  }
-
-  /* ── CLEAR SECTION ── */
-  .clear-section {
-    border-top: 1px solid var(--border);
-    margin-top: 1.5rem;
-    padding-top: 1.25rem;
-  }
-
-  .clear-header {
-    font-size: 0.8rem;
-    margin-bottom: 0.875rem;
-  }
-
-  .clear-body {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-  }
-
-  .clear-btn {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    font-weight: 600;
-    padding: 0.375rem 0.875rem;
-    border-radius: 4px;
-    border: 1px solid var(--border);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
-    cursor: pointer;
-    transition:
-      border-color 0.1s,
-      color 0.1s;
-  }
-  .clear-btn:hover {
-    border-color: var(--accent-error);
-    color: var(--accent-error);
-  }
-
-  .clear-confirm {
-    font-size: 0.8rem;
-    color: var(--accent-success);
-    font-style: italic;
   }
 
   @media (max-width: 600px) {
