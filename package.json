@@ -16,7 +16,7 @@
     "format:check": "prettier --check .",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify": "bun run type-check && bun run lint && bun run format:check && bun run test && bun run build",
+    "verify": "bun run type-check && bun run type-check:scripts && bun run lint && bun run format:check && bun run build && ROUTE_SMOKE_USE_EXISTING_DIST=1 bun run test",
     "icons": "bun scripts/generate-icons.ts",
     "og": "bun scripts/generate-og.ts",
     "prepare": "husky"

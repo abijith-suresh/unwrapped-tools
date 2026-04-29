@@ -9,7 +9,8 @@ import { getToolRoute, tools } from "../tools/registry";
 
 const testDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(testDir, "../..");
-const distDir = resolve(repoRoot, ".astro-test-dist");
+const shouldReuseExistingBuild = process.env.ROUTE_SMOKE_USE_EXISTING_DIST === "1";
+const distDir = resolve(repoRoot, shouldReuseExistingBuild ? "dist" : ".astro-test-dist");
 
 function readBuiltHtml(filePath: string): string {
   const absolutePath = resolve(distDir, filePath);
@@ -24,6 +25,11 @@ function readBuiltAsset(filePath: string): string {
 }
 
 beforeAll(() => {
+  if (shouldReuseExistingBuild) {
+    expect(existsSync(distDir)).toBe(true);
+    return;
+  }
+
   rmSync(distDir, { force: true, recursive: true });
 
   execFileSync("bunx", ["astro", "build", "--outDir", distDir], {
@@ -57,10 +63,10 @@ describe("route smoke", () => {
   it("precaches the home route and every registered tool route in the service worker", () => {
     const serviceWorker = readBuiltAsset("sw.js");
 
-    expect(serviceWorker).toMatch(/"url":\s*"\/"/);
+    expect(serviceWorker).toMatch(/url:\s*"\/"/);
 
     for (const tool of tools) {
-      expect(serviceWorker).toMatch(new RegExp(`"url":\\s*"${getToolRoute(tool.slug).slice(1)}"`));
+      expect(serviceWorker).toMatch(new RegExp(`url:\\s*"${getToolRoute(tool.slug).slice(1)}"`));
     }
   });
 });
