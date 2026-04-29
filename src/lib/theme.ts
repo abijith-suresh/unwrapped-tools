@@ -28,15 +28,29 @@ export function getThemeBootstrapScript(): string {
   const storageKey = ${JSON.stringify(THEME_STORAGE_KEY)};
   const defaultTheme = ${JSON.stringify(DEFAULT_THEME)};
   const validThemes = ${validThemes};
-  const stored = localStorage.getItem(storageKey);
-  const theme = validThemes.includes(stored) ? stored : defaultTheme;
+  let theme = defaultTheme;
+
+  try {
+    const stored = localStorage.getItem(storageKey);
+    if (validThemes.includes(stored)) {
+      theme = stored;
+    }
+  } catch {
+    // Ignore storage access failures during first paint.
+  }
+
   document.documentElement.setAttribute("data-theme", theme);
 })();`;
 }
 
 export function getTheme(): ThemeName {
   if (typeof localStorage === "undefined") return DEFAULT_THEME;
-  return resolveTheme(localStorage.getItem(THEME_STORAGE_KEY));
+
+  try {
+    return resolveTheme(localStorage.getItem(THEME_STORAGE_KEY));
+  } catch {
+    return DEFAULT_THEME;
+  }
 }
 
 export function applyTheme(theme: ThemeName): void {
@@ -45,9 +59,14 @@ export function applyTheme(theme: ThemeName): void {
 
 export function setTheme(theme: ThemeName): void {
   applyTheme(theme);
-  localStorage.setItem(THEME_STORAGE_KEY, theme);
+
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Ignore storage access failures after updating the active theme.
+  }
 }
 
 export function initTheme(): void {
-  setTheme(getTheme());
+  applyTheme(getTheme());
 }

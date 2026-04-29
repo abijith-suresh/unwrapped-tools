@@ -23,5 +23,6 @@ describe("theme utilities", () => {
     expect(script).toContain(THEME_STORAGE_KEY);
     expect(script).toContain(DEFAULT_THEME);
     expect(script).toContain("document.documentElement.setAttribute");
+    expect(script).toContain("try {");
   });
 });
