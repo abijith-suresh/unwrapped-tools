@@ -1,6 +1,16 @@
-import { analyzeDiff, type DiffAnalysisInput, type DiffAnalysisResult } from "./diffAnalysis";
+import type { DiffAnalysisInput, DiffAnalysisResult } from "./diffAnalysis";
+import {
+  createDiffRows,
+  DIFF_CONTEXT,
+  filterRowsWithContext,
+  getChangeSourceIndices,
+  getDiffStats,
+} from "./diff";
 
 export const DIFF_WORKER_THRESHOLD_CHARS = 75_000;
+const STRUCTURED_COMPARE_LANGUAGES = new Set<
+  Pick<DiffAnalysisInput, "leftLanguage">["leftLanguage"]
+>(["json", "toml", "yaml", "env"]);
 
 export interface DiffExecutionRequest {
   requestId: number;
@@ -33,7 +43,7 @@ export interface DiffAnalysisExecutor {
 
 export interface DiffAnalysisExecutorOptions {
   createWorker?: () => WorkerLike | null;
-  syncExecutor?: (input: DiffAnalysisInput) => DiffAnalysisResult;
+  syncExecutor?: (input: DiffAnalysisInput) => DiffAnalysisResult | Promise<DiffAnalysisResult>;
   workerThresholdChars?: number;
 }
 
@@ -42,6 +52,35 @@ export function shouldUseDiffWorker(
   threshold = DIFF_WORKER_THRESHOLD_CHARS
 ): boolean {
   return input.original.length + input.modified.length >= threshold;
+}
+
+export function shouldUseStructuredCompareWorker(
+  input: Pick<DiffAnalysisInput, "leftLanguage" | "rightLanguage">
+): boolean {
+  return (
+    input.leftLanguage === input.rightLanguage &&
+    STRUCTURED_COMPARE_LANGUAGES.has(input.leftLanguage)
+  );
+}
+
+function analyzePlainTextDiff(input: DiffAnalysisInput): DiffAnalysisResult {
+  const rows = createDiffRows(input.original, input.modified);
+  const filteredRows = filterRowsWithContext(
+    rows,
+    input.changesOnly,
+    input.context ?? DIFF_CONTEXT
+  );
+  const stats = getDiffStats(rows);
+
+  return {
+    strategy: "text",
+    errors: [],
+    rows,
+    filteredRows,
+    stats,
+    changeIndices: getChangeSourceIndices(rows),
+    isIdentical: stats.added === 0 && stats.removed === 0,
+  };
 }
 
 function createBrowserWorker(): WorkerLike | null {
@@ -57,7 +96,12 @@ function createBrowserWorker(): WorkerLike | null {
 export function createDiffAnalysisExecutor(
   options: DiffAnalysisExecutorOptions = {}
 ): DiffAnalysisExecutor {
-  const syncExecutor = options.syncExecutor ?? analyzeDiff;
+  const syncExecutor =
+    options.syncExecutor ??
+    (async (input: DiffAnalysisInput) => {
+      const { analyzeDiff } = await import("./diffAnalysis");
+      return analyzeDiff(input);
+    });
   const createWorker = options.createWorker ?? createBrowserWorker;
   const workerThresholdChars = options.workerThresholdChars ?? DIFF_WORKER_THRESHOLD_CHARS;
 
@@ -65,10 +109,24 @@ export function createDiffAnalysisExecutor(
   let worker: WorkerLike | null = null;
   const pendingRequests = new Map<number, PendingWorkerRequest>();
 
-  function createSyncResponse(requestId: number, input: DiffAnalysisInput): DiffExecutionResponse {
+  function createTextSyncResponse(
+    requestId: number,
+    input: DiffAnalysisInput
+  ): DiffExecutionResponse {
     return {
       requestId,
-      result: syncExecutor(input),
+      result: analyzePlainTextDiff(input),
+      mode: "sync",
+    };
+  }
+
+  async function createFullSyncResponse(
+    requestId: number,
+    input: DiffAnalysisInput
+  ): Promise<DiffExecutionResponse> {
+    return {
+      requestId,
+      result: await syncExecutor(input),
       mode: "sync",
     };
   }
@@ -78,7 +136,7 @@ export function createDiffAnalysisExecutor(
     pendingRequests.clear();
 
     for (const request of queuedRequests) {
-      request.resolve(createSyncResponse(request.requestId, request.input));
+      void createFullSyncResponse(request.requestId, request.input).then(request.resolve);
     }
   }
 
@@ -129,15 +187,17 @@ export function createDiffAnalysisExecutor(
     },
     execute(input) {
       const requestId = ++nextRequestId;
+      const needsWorker =
+        shouldUseStructuredCompareWorker(input) || shouldUseDiffWorker(input, workerThresholdChars);
 
-      if (!shouldUseDiffWorker(input, workerThresholdChars)) {
-        return Promise.resolve(createSyncResponse(requestId, input));
+      if (!needsWorker) {
+        return Promise.resolve(createTextSyncResponse(requestId, input));
       }
 
       const activeWorker = getWorker();
 
       if (!activeWorker) {
-        return Promise.resolve(createSyncResponse(requestId, input));
+        return createFullSyncResponse(requestId, input);
       }
 
       return new Promise((resolve) => {
@@ -148,7 +208,7 @@ export function createDiffAnalysisExecutor(
         } catch {
           pendingRequests.delete(requestId);
           disposeWorker();
-          resolve(createSyncResponse(requestId, input));
+          void createFullSyncResponse(requestId, input).then(resolve);
         }
       });
     },

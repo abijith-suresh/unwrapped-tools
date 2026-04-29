@@ -1,5 +1,4 @@
-import { parse as parseToml, stringify as stringifyToml } from "@iarna/toml";
-import type { JsonMap as TomlTable } from "@iarna/toml";
+import { parse as parseToml, stringify as stringifyToml, type TomlTable } from "smol-toml";
 import { parseAllDocuments, stringify } from "yaml";
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue };

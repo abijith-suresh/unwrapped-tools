@@ -68,6 +68,35 @@ describe("diffExecution browser runtime", () => {
     expect(response.result.stats).toEqual({ added: 1, removed: 1 });
   });
 
+  it("uses the worker transport for structured compare inputs below the size threshold", async () => {
+    const worker = createMockWorker((message, currentWorker) => {
+      currentWorker.onmessage?.({
+        data: {
+          requestId: message.requestId,
+          result: analyzeDiff(message.input),
+          mode: "worker",
+        },
+      } as MessageEvent<DiffExecutionResponse>);
+    });
+    const executor = createDiffAnalysisExecutor({
+      createWorker: () => worker,
+      workerThresholdChars: 1_000_000,
+    });
+
+    const response = await executor.execute({
+      original: '{"a":1,"b":2}',
+      modified: '{"b":2,"a":1}',
+      leftLanguage: "json",
+      rightLanguage: "json",
+      changesOnly: true,
+    });
+
+    expect(worker.postMessageSpy).toHaveBeenCalledTimes(1);
+    expect(response.mode).toBe("worker");
+    expect(response.result.strategy).toBe("json");
+    expect(response.result.isIdentical).toBe(true);
+  });
+
   it("falls back to sync execution when worker creation fails", async () => {
     const executor = createDiffAnalysisExecutor({
       createWorker: () => {

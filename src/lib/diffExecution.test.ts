@@ -1,8 +1,23 @@
 import { describe, expect, it } from "vitest";
 
-import { createDiffAnalysisExecutor } from "./diffExecution";
+import { createDiffAnalysisExecutor, shouldUseStructuredCompareWorker } from "./diffExecution";
 
 describe("diffExecution", () => {
+  it("detects structured inputs that should prefer the worker", () => {
+    expect(shouldUseStructuredCompareWorker({ leftLanguage: "json", rightLanguage: "json" })).toBe(
+      true
+    );
+    expect(shouldUseStructuredCompareWorker({ leftLanguage: "yaml", rightLanguage: "yaml" })).toBe(
+      true
+    );
+    expect(shouldUseStructuredCompareWorker({ leftLanguage: "json", rightLanguage: "yaml" })).toBe(
+      false
+    );
+    expect(shouldUseStructuredCompareWorker({ leftLanguage: "text", rightLanguage: "text" })).toBe(
+      false
+    );
+  });
+
   it("executes synchronously when worker transport is unavailable", async () => {
     const executor = createDiffAnalysisExecutor({
       createWorker: () => null,
