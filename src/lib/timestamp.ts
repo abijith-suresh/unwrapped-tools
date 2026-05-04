@@ -3,6 +3,11 @@ export interface TimeZoneOption {
   tz: string;
 }
 
+export interface DerivedTimestampFormat {
+  label: string;
+  value: string;
+}
+
 export const DEFAULT_ZONES: TimeZoneOption[] = [
   { label: "UTC", tz: "UTC" },
   { label: "US/Eastern", tz: "America/New_York" },
@@ -65,6 +70,41 @@ export function formatInZone(date: Date, tz: string): string {
   } catch {
     return "Invalid timezone";
   }
+}
+
+export function formatUtcString(date: Date): string {
+  return date.toUTCString();
+}
+
+export function formatRfc3339(date: Date): string {
+  return date.toISOString();
+}
+
+export function formatRfc7231(date: Date): string {
+  return date.toUTCString();
+}
+
+export function formatIso9075(date: Date): string {
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(date.getUTCDate())} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(date.getUTCSeconds())}`;
+}
+
+export function formatMongoObjectIdSeed(date: Date): string {
+  return Math.floor(date.getTime() / 1000)
+    .toString(16)
+    .padStart(8, "0");
+}
+
+export function getDerivedTimestampFormats(date: Date): DerivedTimestampFormat[] {
+  return [
+    { label: "ISO 8601", value: date.toISOString() },
+    { label: "RFC 3339", value: formatRfc3339(date) },
+    { label: "RFC 7231", value: formatRfc7231(date) },
+    { label: "UTC string", value: formatUtcString(date) },
+    { label: "ISO 9075", value: formatIso9075(date) },
+    { label: "Mongo ObjectID seed", value: formatMongoObjectIdSeed(date) },
+  ];
 }
 
 export function localInputToMs(value: string): number | null {
