@@ -7,7 +7,10 @@ export default function JsonFormatter() {
   const [input, setInput] = createSignal("");
   const [indent, setIndent] = createSignal<IndentSize>(2);
   const [minify, setMinify] = createSignal(false);
-  const result = createMemo((): JsonFormatResult => formatJson(input(), indent(), minify()));
+  const [sortKeys, setSortKeys] = createSignal(false);
+  const result = createMemo(
+    (): JsonFormatResult => formatJson(input(), indent(), minify(), sortKeys())
+  );
 
   const tabStyle = (active: boolean) => ({
     padding: "0.25rem 0.625rem",
@@ -90,6 +93,24 @@ export default function JsonFormatter() {
           Minify
         </button>
 
+        <button
+          style={{
+            padding: "0.25rem 0.75rem",
+            "border-radius": "0.375rem",
+            border: `1px solid ${sortKeys() ? "var(--accent-primary)" : "var(--border)"}`,
+            background: sortKeys()
+              ? "color-mix(in srgb, var(--accent-primary) 15%, transparent)"
+              : "var(--bg-secondary)",
+            color: sortKeys() ? "var(--accent-primary)" : "var(--text-secondary)",
+            "font-size": "0.75rem",
+            "font-weight": "600",
+            cursor: "pointer",
+          }}
+          onClick={() => setSortKeys((value) => !value)}
+        >
+          Sort keys
+        </button>
+
         <Show when={input().trim()}>
           <button
             style={{
@@ -151,16 +172,50 @@ export default function JsonFormatter() {
           <div
             role="alert"
             style={{
+              display: "flex",
+              "flex-direction": "column",
+              gap: "0.75rem",
               padding: "0.75rem 1rem",
               "border-radius": "0.5rem",
               border: "1px solid var(--accent-error)",
               background: "color-mix(in srgb, var(--accent-error) 12%, transparent)",
               color: "var(--accent-error)",
               "font-size": "0.875rem",
-              "font-family": "var(--font-mono)",
             }}
           >
-            {msg()}
+            <div style={{ "font-family": "var(--font-mono)" }}>{msg()}</div>
+            <Show when={result().errorLine && result().errorColumn}>
+              <div
+                style={{
+                  color: "var(--text-secondary)",
+                  "font-size": "0.8125rem",
+                  "font-family": "var(--font-mono)",
+                }}
+              >
+                Line {result().errorLine}, column {result().errorColumn}
+              </div>
+            </Show>
+            <Show when={result().errorContext}>
+              {(context) => (
+                <pre
+                  style={{
+                    margin: "0",
+                    padding: "0.75rem",
+                    background: "color-mix(in srgb, var(--bg-secondary) 88%, transparent)",
+                    color: "var(--text-primary)",
+                    border: "1px solid var(--border)",
+                    "border-radius": "0.375rem",
+                    "font-size": "0.8125rem",
+                    "line-height": "1.5",
+                    "font-family": "var(--font-mono)",
+                    "white-space": "pre-wrap",
+                    "word-break": "break-word",
+                  }}
+                >
+                  {context()}
+                </pre>
+              )}
+            </Show>
           </div>
         )}
       </Show>
@@ -193,7 +248,9 @@ export default function JsonFormatter() {
                   color: "var(--text-secondary)",
                 }}
               >
-                {minify() ? "Minified" : `Formatted · ${indent()} spaces`}
+                {minify()
+                  ? `Minified${sortKeys() ? " · sorted" : ""}`
+                  : `Formatted · ${indent()} spaces${sortKeys() ? " · sorted" : ""}`}
               </span>
               <CopyButton text={result().raw} />
             </div>
