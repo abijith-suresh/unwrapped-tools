@@ -6,6 +6,7 @@ import ToolStatusMessage from "@/components/ToolStatusMessage";
 import {
   DEFAULT_ZONES,
   formatInZone,
+  getDerivedTimestampFormats,
   localInputToMs,
   msToLocalInput,
   parseEpoch,
@@ -277,6 +278,69 @@ export default function TimestampTool() {
         )}
       </Show>
 
+      <Show when={date()}>
+        {(d) => (
+          <div
+            style={{
+              background: "var(--bg-secondary)",
+              border: "1px solid var(--border)",
+              "border-radius": "0.5rem",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              style={{
+                padding: "0.625rem 1rem",
+                "border-bottom": "1px solid var(--border)",
+              }}
+            >
+              <span style={labelStyle}>Derived formats</span>
+            </div>
+
+            <div
+              style={{
+                padding: "0.75rem 1rem",
+                display: "grid",
+                "grid-template-columns": "repeat(auto-fit, minmax(220px, 1fr))",
+                gap: "0.75rem",
+              }}
+            >
+              <For each={getDerivedTimestampFormats(d())}>
+                {(item) => (
+                  <div
+                    style={{
+                      display: "flex",
+                      "flex-direction": "column",
+                      gap: "0.375rem",
+                      padding: "0.75rem",
+                      background: "var(--bg-primary)",
+                      border: "1px solid var(--border)",
+                      "border-radius": "0.375rem",
+                    }}
+                  >
+                    <span style={labelStyle}>{item.label}</span>
+                    <code
+                      style={{
+                        "font-size": "0.8125rem",
+                        color: "var(--text-primary)",
+                        "font-family":
+                          "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+                        "word-break": "break-all",
+                      }}
+                    >
+                      {item.value}
+                    </code>
+                    <div style={{ display: "flex", "justify-content": "flex-end" }}>
+                      <CopyButton text={item.value} />
+                    </div>
+                  </div>
+                )}
+              </For>
+            </div>
+          </div>
+        )}
+      </Show>
+
       {/* ------------------------------------------------------------------ */}
       {/* Timezone panel                                                      */}
       {/* ------------------------------------------------------------------ */}
@@ -317,7 +381,6 @@ export default function TimestampTool() {
                       "align-items": "center",
                     }}
                   >
-                    {/* Zone selector */}
                     <select
                       value={zone.tz}
                       onChange={(e) => changeZone(i(), e.currentTarget.value)}
@@ -337,7 +400,6 @@ export default function TimestampTool() {
                       </For>
                     </select>
 
-                    {/* Formatted time */}
                     <code
                       style={{
                         "font-size": "0.875rem",
