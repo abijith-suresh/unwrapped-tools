@@ -130,6 +130,16 @@ export const tools: Tool[] = [
     slug: "token-generator",
     componentPath: "/src/tools/token-generator/TokenGenerator.tsx",
   },
+  {
+    id: "url-encoder",
+    name: "URL Encoder / Decoder",
+    description: "Percent-encode or decode text locally with clear invalid-input feedback.",
+    category: "encoding",
+    keywords: ["url", "encode", "decode", "percent", "uri", "query"],
+    icon: "Link2",
+    slug: "url-encoder",
+    componentPath: "/src/tools/url-encoder/UrlEncoderTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {

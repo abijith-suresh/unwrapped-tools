@@ -40,4 +40,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/token-generator/TokenGenerator.tsx",
     });
   });
+
+  it("includes the URL encoder route", () => {
+    expect(getToolBySlug("url-encoder")).toMatchObject({
+      id: "url-encoder",
+      category: "encoding",
+      componentPath: "/src/tools/url-encoder/UrlEncoderTool.tsx",
+    });
+  });
 });
