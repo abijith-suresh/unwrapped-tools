@@ -120,4 +120,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/url-inspector/UrlInspectorTool.tsx",
     });
   });
+
+  it("includes the cron route", () => {
+    expect(getToolBySlug("cron")).toMatchObject({
+      id: "cron",
+      category: "time",
+      componentPath: "/src/tools/cron/CronTool.tsx",
+    });
+  });
 });

@@ -230,6 +230,16 @@ export const tools: Tool[] = [
     slug: "url-inspector",
     componentPath: "/src/tools/url-inspector/UrlInspectorTool.tsx",
   },
+  {
+    id: "cron",
+    name: "Cron Schedule",
+    description: "Parse supported cron syntax, humanize it, and preview upcoming runs locally.",
+    category: "time",
+    keywords: ["cron", "schedule", "time", "parser", "preview", "humanize"],
+    icon: "CalendarClock",
+    slug: "cron",
+    componentPath: "/src/tools/cron/CronTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {
