@@ -80,4 +80,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/yaml-formatter/YamlFormatterTool.tsx",
     });
   });
+
+  it("includes the XML formatter route", () => {
+    expect(getToolBySlug("xml-formatter")).toMatchObject({
+      id: "xml-formatter",
+      category: "data",
+      componentPath: "/src/tools/xml-formatter/XmlFormatterTool.tsx",
+    });
+  });
 });

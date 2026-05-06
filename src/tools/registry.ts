@@ -180,6 +180,16 @@ export const tools: Tool[] = [
     slug: "yaml-formatter",
     componentPath: "/src/tools/yaml-formatter/YamlFormatterTool.tsx",
   },
+  {
+    id: "xml-formatter",
+    name: "XML Formatter",
+    description: "Format XML locally with indentation control and clear invalid-input feedback.",
+    category: "data",
+    keywords: ["xml", "format", "prettify", "indent", "markup", "validate"],
+    icon: "Brackets",
+    slug: "xml-formatter",
+    componentPath: "/src/tools/xml-formatter/XmlFormatterTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {
