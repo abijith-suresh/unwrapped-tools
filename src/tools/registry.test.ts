@@ -104,4 +104,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/chmod-calculator/ChmodCalculatorTool.tsx",
     });
   });
+
+  it("includes the HMAC generator route", () => {
+    expect(getToolBySlug("hmac-generator")).toMatchObject({
+      id: "hmac-generator",
+      category: "security",
+      componentPath: "/src/tools/hmac-generator/HmacGeneratorTool.tsx",
+    });
+  });
 });

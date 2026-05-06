@@ -210,6 +210,16 @@ export const tools: Tool[] = [
     slug: "chmod-calculator",
     componentPath: "/src/tools/chmod-calculator/ChmodCalculatorTool.tsx",
   },
+  {
+    id: "hmac-generator",
+    name: "HMAC Generator",
+    description: "Generate SHA-based HMAC signatures locally with the browser Web Crypto API.",
+    category: "security",
+    keywords: ["hmac", "crypto", "sha", "signature", "secret", "webhook"],
+    icon: "KeyRound",
+    slug: "hmac-generator",
+    componentPath: "/src/tools/hmac-generator/HmacGeneratorTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {
