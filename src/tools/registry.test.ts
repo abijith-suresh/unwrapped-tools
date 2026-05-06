@@ -48,4 +48,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/url-encoder/UrlEncoderTool.tsx",
     });
   });
+
+  it("includes the HTTP status codes route", () => {
+    expect(getToolBySlug("http-status-codes")).toMatchObject({
+      id: "http-status-codes",
+      category: "network",
+      componentPath: "/src/tools/http-status-codes/HttpStatusCodesTool.tsx",
+    });
+  });
 });

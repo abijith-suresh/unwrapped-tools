@@ -140,6 +140,16 @@ export const tools: Tool[] = [
     slug: "url-encoder",
     componentPath: "/src/tools/url-encoder/UrlEncoderTool.tsx",
   },
+  {
+    id: "http-status-codes",
+    name: "HTTP Status Codes",
+    description: "Search a bundled local reference of common HTTP response codes.",
+    category: "network",
+    keywords: ["http", "status", "codes", "response", "network", "api"],
+    icon: "BadgeInfo",
+    slug: "http-status-codes",
+    componentPath: "/src/tools/http-status-codes/HttpStatusCodesTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {
