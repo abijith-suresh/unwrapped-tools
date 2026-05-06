@@ -96,4 +96,12 @@ describe("tool registry", () => {
       componentPath: "/src/tools/json-to-csv/JsonToCsvTool.tsx",
     });
   });
+
+  it("includes the chmod calculator route", () => {
+    expect(getToolBySlug("chmod-calculator")).toMatchObject({
+      id: "chmod-calculator",
+      category: "security",
+      componentPath: "/src/tools/chmod-calculator/ChmodCalculatorTool.tsx",
+    });
+  });
 });

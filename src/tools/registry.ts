@@ -200,6 +200,16 @@ export const tools: Tool[] = [
     slug: "json-to-csv",
     componentPath: "/src/tools/json-to-csv/JsonToCsvTool.tsx",
   },
+  {
+    id: "chmod-calculator",
+    name: "chmod Calculator",
+    description: "Derive octal, symbolic, and command output for Unix file permissions.",
+    category: "security",
+    keywords: ["chmod", "permissions", "unix", "linux", "octal", "symbolic"],
+    icon: "ShieldCheck",
+    slug: "chmod-calculator",
+    componentPath: "/src/tools/chmod-calculator/ChmodCalculatorTool.tsx",
+  },
 ];
 
 export function getToolRoute(slug: string): `/tools/${string}` {
